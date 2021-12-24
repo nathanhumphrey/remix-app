@@ -6,27 +6,23 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useCatch
-} from "remix";
-import type { LinksFunction } from "remix";
+  useCatch,
+} from 'remix';
 
-import globalStylesUrl from "~/styles/global.css";
-import darkStylesUrl from "~/styles/dark.css";
+import globalStylesUrl from '~/styles/global.css';
+import darkStylesUrl from '~/styles/dark.css';
 
-// https://remix.run/api/app#links
-export let links: LinksFunction = () => {
+export let links = () => {
   return [
-    { rel: "stylesheet", href: globalStylesUrl },
+    { rel: 'stylesheet', href: globalStylesUrl },
     {
-      rel: "stylesheet",
+      rel: 'stylesheet',
       href: darkStylesUrl,
-      media: "(prefers-color-scheme: dark)"
-    }
+      media: '(prefers-color-scheme: dark)',
+    },
   ];
 };
 
-// https://remix.run/api/conventions#default-export
-// https://remix.run/api/conventions#route-filenames
 export default function App() {
   return (
     <Document>
@@ -37,8 +33,7 @@ export default function App() {
   );
 }
 
-// https://remix.run/docs/en/v1/api/conventions#errorboundary
-export function ErrorBoundary({ error }: { error: Error }) {
+export function ErrorBoundary({ error }) {
   console.error(error);
   return (
     <Document title="Error!">
@@ -57,10 +52,8 @@ export function ErrorBoundary({ error }: { error: Error }) {
   );
 }
 
-// https://remix.run/docs/en/v1/api/conventions#catchboundary
 export function CatchBoundary() {
   let caught = useCatch();
-
   let message;
   switch (caught.status) {
     case 401:
@@ -93,13 +86,7 @@ export function CatchBoundary() {
   );
 }
 
-function Document({
-  children,
-  title
-}: {
-  children: React.ReactNode;
-  title?: string;
-}) {
+function Document({ children, title }) {
   return (
     <html lang="en">
       <head>
@@ -113,13 +100,13 @@ function Document({
         {children}
         <ScrollRestoration />
         <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
+        {process.env.NODE_ENV === 'development' && <LiveReload />}
       </body>
     </html>
   );
 }
 
-function Layout({ children }: { children: React.ReactNode }) {
+function Layout({ children }) {
   return (
     <div className="remix-app">
       <header className="remix-app__header">
@@ -131,12 +118,6 @@ function Layout({ children }: { children: React.ReactNode }) {
             <ul>
               <li>
                 <Link to="/">Home</Link>
-              </li>
-              <li>
-                <a href="https://remix.run/docs">Remix Docs</a>
-              </li>
-              <li>
-                <a href="https://github.com/remix-run/remix">GitHub</a>
               </li>
             </ul>
           </nav>
@@ -154,7 +135,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function RemixLogo() {
+function RemixLogo(props) {
   return (
     <svg
       viewBox="0 0 659 165"
@@ -166,6 +147,7 @@ function RemixLogo() {
       width="106"
       height="30"
       fill="currentColor"
+      {...props}
     >
       <title id="remix-run-logo-title">Remix Logo</title>
       <path d="M0 161V136H45.5416C53.1486 136 54.8003 141.638 54.8003 145V161H0Z M133.85 124.16C135.3 142.762 135.3 151.482 135.3 161H92.2283C92.2283 158.927 92.2653 157.03 92.3028 155.107C92.4195 149.128 92.5411 142.894 91.5717 130.304C90.2905 111.872 82.3473 107.776 67.7419 107.776H54.8021H0V74.24H69.7918C88.2407 74.24 97.4651 68.632 97.4651 53.784C97.4651 40.728 88.2407 32.816 69.7918 32.816H0V0H77.4788C119.245 0 140 19.712 140 51.2C140 74.752 125.395 90.112 105.665 92.672C122.32 96 132.057 105.472 133.85 124.16Z" />
