@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Form, redirect, useActionData, useSubmit } from 'remix';
+import { Form, redirect, useActionData, useLoaderData, useSubmit } from 'remix';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -33,11 +33,15 @@ export const action = async ({ request }) => {
 };
 
 export const loader = async ({ request }) => {
+  const dev = process.env.NODE_ENV === 'development';
   const session = await getUserSession(request);
-  return (await session.get('displayName')) ? redirect('/secrets') : null;
+  return (await session.get('displayName'))
+    ? redirect('/secrets')
+    : { isDev: dev };
 };
 
 export default function Index() {
+  const { isDev } = useLoaderData();
   const actionError = useActionData();
   const [error, setError] = useState(null);
   const submit = useSubmit();
@@ -53,7 +57,7 @@ export default function Index() {
 
       // TODO: add an env check for USE_EMULATOR
       // https://remix.run/docs/en/v1.0.6/guides/envvars#browser-environment-variables
-      if (!auth.emulatorConfig) {
+      if (isDev && !auth.emulatorConfig) {
         connectAuthEmulator(auth, 'http://localhost:9099');
       }
 
@@ -93,25 +97,25 @@ export default function Index() {
   };
 
   return (
-    <div className="remix__page">
+    <div className='remix__page'>
       <main>
         <h2>Remix Secrets</h2>
         <p>Save all your secret stuff here!</p>
       </main>
       <section>
-        <Form method="post" onSubmit={handleLogin}>
-          <label htmlFor="email">Email:</label>
-          <input type="text" id="email" name="email" ref={emailRef} />
+        <Form method='post' onSubmit={handleLogin}>
+          <label htmlFor='email'>Email:</label>
+          <input type='text' id='email' name='email' ref={emailRef} />
           <br />
-          <label htmlFor="email">Password:</label>
+          <label htmlFor='email'>Password:</label>
           <input
-            type="password"
-            id="password"
-            name="password"
+            type='password'
+            id='password'
+            name='password'
             ref={passwordRef}
           />
           <br />
-          <button type="submit">Login</button>
+          <button type='submit'>Login</button>
           {error?.errorCode && (
             <p>
               <em>Login failed: {error.errorMessage}</em>

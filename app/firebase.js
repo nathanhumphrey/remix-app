@@ -1,9 +1,4 @@
-import {
-  initializeApp,
-  applicationDefault,
-  getApps,
-  getApp,
-} from 'firebase-admin/app';
+import { cert, initializeApp, getApps, getApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore'; // new
 
@@ -19,9 +14,10 @@ if (process.env.NODE_ENV === 'development') {
   auth = getAuth();
   db = getFirestore(); // new
 } else {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
   app =
     getApps().length === 0
-      ? initializeApp({ credential: applicationDefault() })
+      ? initializeApp({ credential: cert(serviceAccount) })
       : getApp();
   auth = getAuth();
   db = getFirestore(); // new
