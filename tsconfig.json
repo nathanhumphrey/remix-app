@@ -11,6 +11,10 @@
     "paths": {
       "~/*": ["./app/*"]
     },
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitAny": true,
 
     // Remix takes care of building everything in `remix build`.
     "noEmit": true

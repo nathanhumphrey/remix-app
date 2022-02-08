@@ -119,6 +119,9 @@ function Layout({ children }) {
               <li>
                 <Link to="/">Home</Link>
               </li>
+              <li>
+                <Link to={'/protected'}>Protected Page</Link>
+              </li>
             </ul>
           </nav>
         </div>
