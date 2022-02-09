@@ -1,7 +1,6 @@
-import { Firestore } from 'firebase-admin/firestore';
 import { json, redirect } from 'remix';
 import { auth } from '~/firebase';
-import type { AuthInterface, AuthSessionType } from '.';
+import type { AuthInterface, AuthSessionType, AuthUserType } from '.';
 
 // Required for use in REST API to sign in user
 const API_KEY: string = process.env.FIREBASE_WEB_API_KEY!;
@@ -13,14 +12,14 @@ if (process.env.NODE_ENV === 'development') {
   URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
 }
 
-export class FirebaseAuth implements AuthInterface {
+export class FirebaseAuth implements AuthInterface<AuthUserType> {
   constructor(private session: AuthSessionType) {}
 
-  signUp(username: string, password: string): void {
+  createAccount(user: AuthUserType): void {
     throw new Error('Method not implemented.');
   }
 
-  async login(username: string, password: string): Promise<any> {
+  async login(user: AuthUserType): Promise<any> {
     try {
       const headers: Headers = new Headers();
       headers.append('Content-Type', 'application/json');
@@ -28,7 +27,7 @@ export class FirebaseAuth implements AuthInterface {
       const req: Request = new Request(URL, {
         method: 'post',
         headers,
-        body: JSON.stringify({ username, password, returnSecureToken: true }),
+        body: JSON.stringify({ ...user, returnSecureToken: true }),
       });
 
       const authResponse: Response = await fetch(req);
@@ -67,7 +66,7 @@ export class FirebaseAuth implements AuthInterface {
     this.session.destroyAuthSession(request, redirectTo);
   }
 
-  exists(username: string): boolean {
+  exists(user: AuthUserType): boolean {
     throw new Error('Method not implemented.');
   }
 

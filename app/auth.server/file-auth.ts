@@ -1,13 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { json, redirect } from 'remix';
-import type { AuthInterface, AuthSessionType } from '.';
-
-type UserType = {
-  id: string;
-  username: string;
-  password: string;
-};
+import type { AuthInterface, AuthSessionType, AuthUserType } from '.';
 
 // location of users.json file relative to build path NOT app
 const usersFile = '../../app/auth.server/users.json';
@@ -16,10 +10,10 @@ const usersFile = '../../app/auth.server/users.json';
  * DO NOT USE THIS IMPLEMENTATION IN PRODUCTION.
  * USES SEVERAL INSECURE IMPLEMENTATIONS (E.G. PLAIN TEXT PASSWORDS,
  * NO AUTH SESSION VERIFICATION, ETC.).
- * FOR TESTING PURPOSES ONLY
+ * FOR TESTING PURPOSES ONLY.
  */
-export class FileAuth implements AuthInterface {
-  private users: UserType[];
+export class FileAuth implements AuthInterface<AuthUserType> {
+  private users: AuthUserType[];
 
   constructor(private session: AuthSessionType) {
     let rawdata = readFileSync(path.join(__dirname, usersFile));
@@ -27,13 +21,13 @@ export class FileAuth implements AuthInterface {
     this.users = users;
   }
 
-  async signUp(
-    username: string,
-    password: string,
+  async createAccount(
+    user: AuthUserType,
     redirectTo: string
   ): Promise<Response> {
-    if (!this.exists(username)) {
-      this.users.push({ id: UUID.generate(), username, password });
+    if (!this.exists(user)) {
+      user.id = UUID.generate();
+      this.users.push(user);
       writeFileSync(JSON.stringify(this.users), usersFile);
       if (redirectTo) {
         return redirect(redirectTo);
@@ -50,7 +44,7 @@ export class FileAuth implements AuthInterface {
         {
           status: 'error',
           errorCode: 'auth/signUp',
-          errorMessage: `User with username: ${username} already exists`,
+          errorMessage: `User with username: ${user.username} already exists`,
         },
         {
           status: 409,
@@ -59,12 +53,14 @@ export class FileAuth implements AuthInterface {
     }
   }
 
-  async login(username: string, password: string): Promise<Response> {
-    if (this.exists(username)) {
-      let user = this.users.filter((user) => user.username === username).pop();
-      if (user?.password === password) {
+  async login(user: AuthUserType): Promise<Response> {
+    if (this.exists(user)) {
+      let match: AuthUserType = this.users
+        .filter((u) => user.username === u.username)
+        .pop()!;
+      if (match?.password === user.password) {
         // stuff any required info into the user session
-        return this.session.createAuthSession({ id: user.id });
+        return this.session.createAuthSession({ id: match.id });
       }
     }
     return json(
@@ -79,8 +75,8 @@ export class FileAuth implements AuthInterface {
     );
   }
 
-  exists(username: string): boolean {
-    const check = this.users.filter((user) => user.username === username);
+  exists(user: AuthUserType): boolean {
+    const check = this.users.filter((u) => u.username === user.username);
     if (check.length === 1) {
       return true;
     }
@@ -110,15 +106,14 @@ export class FileAuth implements AuthInterface {
     }
   }
 
-  logout(request: Request, redirectTo: string = '/'): Promise<any> {
+  logout(request: Request, redirectTo: string = '/'): Promise<Response> {
     return this.session.destroyAuthSession(request, redirectTo);
   }
 
-  async user(request: Request): Promise<any> {
+  async user(request: Request): Promise<AuthUserType | null> {
     const session = await this.session.getAuthSession(request);
     const id = session.get('id');
-    let user: UserType;
-
+    let user: AuthUserType;
     if (id) {
       // _assuming_ the id exists, will cause an error otherwise
       user = this.users.find((u) => u.id === id)!;

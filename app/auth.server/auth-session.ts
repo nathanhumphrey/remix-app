@@ -3,7 +3,7 @@ import { getSession, commitSession, destroySession } from '~/util/session';
 import type { Session } from 'remix';
 import type { AuthSessionType } from '~/auth.server';
 
-const authSession: AuthSessionType = {
+export const authSession: AuthSessionType = {
   async getAuthSession(request: Request): Promise<Session> {
     return await getSession(request.headers.get('Cookie'));
   },
@@ -69,5 +69,3 @@ const authSession: AuthSessionType = {
     }
   },
 };
-
-export { authSession };

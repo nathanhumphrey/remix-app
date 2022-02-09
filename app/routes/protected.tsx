@@ -2,6 +2,12 @@ import { Form, redirect, useLoaderData } from 'remix';
 import type { LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
 
+export let meta = () => {
+  return {
+    title: 'Protected Page',
+  };
+};
+
 export const loader: LoaderFunction = async ({ request }) => {
   try {
     const authRes = await auth.requireUser(request);
@@ -14,12 +20,6 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect('/');
   }
   return redirect('/');
-};
-
-export let meta = () => {
-  return {
-    title: 'Remix Secrets App - Secrets Page',
-  };
 };
 
 export default function Secrets() {
