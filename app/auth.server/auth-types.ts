@@ -18,12 +18,17 @@ export type AuthSessionType = {
    */
   createAuthSession(data: any, redirectTo?: string): Promise<Response>;
   /**
-   * Destroys the user session.
+   * Destroys or otherwise invalidates the user session.
    * @param {Request} request the resource request
+   * @param {strin[] | string} keys the session keys to invalidate
    * @param {string} redirectTo the location to redirect to on success
    * @returns {Promise<Response>} Promise object that resolves a Response
    */
-  destroyAuthSession(request: Request, redirectTo?: string): Promise<Response>;
+  destroyAuthSession(
+    request: Request,
+    keys: string[] | string,
+    redirectTo?: string
+  ): Promise<Response>;
 };
 
 /**
@@ -43,6 +48,10 @@ export type AuthUserType = {
    * User's password; for sign in and account creation
    */
   password?: any;
+  /**
+   * Display name for the user
+   */
+  name?: string;
   /**
    * Assigned role for the user account
    */

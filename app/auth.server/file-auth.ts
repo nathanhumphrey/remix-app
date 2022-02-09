@@ -58,6 +58,7 @@ export class FileAuth implements AuthInterface<AuthUserType> {
       let match: AuthUserType = this.users
         .filter((u) => user.username === u.username)
         .pop()!;
+
       if (match?.password === user.password) {
         // stuff any required info into the user session
         return this.session.createAuthSession({ id: match.id });
@@ -107,17 +108,18 @@ export class FileAuth implements AuthInterface<AuthUserType> {
   }
 
   logout(request: Request, redirectTo: string = '/'): Promise<Response> {
-    return this.session.destroyAuthSession(request, redirectTo);
+    return this.session.destroyAuthSession(request, ['id'], redirectTo);
   }
 
   async user(request: Request): Promise<AuthUserType | null> {
     const session = await this.session.getAuthSession(request);
     const id = session.get('id');
     let user: AuthUserType;
+
     if (id) {
       // _assuming_ the id exists, will cause an error otherwise
       user = this.users.find((u) => u.id === id)!;
-      return { id: user.id, username: user.username };
+      return { id: user.id, username: user.username, name: user.name };
     } else {
       return null;
     }

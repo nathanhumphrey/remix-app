@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { json, Form, useActionData, useLoaderData } from 'remix';
 import type { ActionFunction, LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
+import { getSession } from '~/util/session';
 
 export let meta = () => {
   return {
@@ -30,7 +31,11 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  return auth.user(request);
+  try {
+    return await auth.user(request);
+  } catch (error) {
+    throw error;
+  }
 };
 
 export default function Index() {
@@ -45,7 +50,7 @@ export default function Index() {
         <h2>Home Page</h2>
         <p>Everyone can view the home page.</p>
         {(user && (
-          <p>Hello {user.username}, you can now view the protected page.</p>
+          <p>Hello {user.name}, you can now view the protected page.</p>
         )) || (
           <section>
             <Form className="remix__form" method="post">

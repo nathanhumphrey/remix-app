@@ -29,7 +29,7 @@ export default function Secrets() {
     <div className="remix__page">
       <main>
         <h2>Protected Page</h2>
-        <p>Hello {user.username}, you must be logged in to view this page.</p>
+        <p>Hello {user.name}, you must be logged in to view this page.</p>
         <Form method="post" action="/logout">
           <button>Logout</button>
         </Form>
