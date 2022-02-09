@@ -71,7 +71,7 @@ WIP
 
 ## Firebase Integration
 
-The project also includes a basic Firebase Auth and Firebase Firestore implementation. In order to configure Firebase use in the project, you will have to create a Firebase project or already have one created. You must configure several environment variables for Firebase access.
+The project also includes a basic Firebase Auth and Firebase Firestore implementation. In order to configure Firebase use in the project, you will have to create a Firebase project or already have one created. You must configure several environment variables for Firebase access (see [Environment Variables](#environment-variables) below).
 
 To begin, initialize Firebase in the project directory:
 
