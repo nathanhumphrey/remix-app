@@ -1,8 +1,7 @@
 import { useRef } from 'react';
-import { json, Form, useActionData, useLoaderData } from 'remix';
+import { json, Form, useActionData, useLoaderData, Link } from 'remix';
 import type { ActionFunction, LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
-import { getSession } from '~/util/session';
 
 export let meta = () => {
   return {
@@ -14,9 +13,31 @@ export const action: ActionFunction = async ({ request }) => {
   try {
     const form = await request.formData();
 
-    const email: string = form.get('email')!.toString();
-    const password = form.get('password')!.toString();
+    // TODO: implement proper form validation
+    const email: any = form.get('email');
+    const password: any = form.get('password');
+
     // TODO: form validation
+    if (!email || email.trim() === '') {
+      return json(
+        {
+          errorCode: 'signup/invalid-email',
+          errorMessage: 'Email field cannot be empty',
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!password || password.trim() === '') {
+      return json(
+        {
+          errorCode: 'signup/invalid-password',
+          errorMessage: 'Password field cannot be empty',
+        },
+        { status: 400 }
+      );
+    }
+
     // TODO: CSRF check
     return auth.login({ username: email, password });
   } catch (error) {
@@ -31,11 +52,7 @@ export const action: ActionFunction = async ({ request }) => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  try {
-    return await auth.user(request);
-  } catch (error) {
-    throw error;
-  }
+  return await auth.user(request);
 };
 
 export default function Index() {
@@ -50,7 +67,14 @@ export default function Index() {
         <h2>Home Page</h2>
         <p>Everyone can view the home page.</p>
         {(user && (
-          <p>Hello {user.name}, you can now view the protected page.</p>
+          <>
+            <p>
+              Hello {user.name}, you can now view the <Link to="/protected">protected page.</Link>
+            </p>
+            <Form method="post" action="/logout">
+              <button>Logout</button>
+            </Form>
+          </>
         )) || (
           <section>
             <Form className="remix__form" method="post">
@@ -59,12 +83,7 @@ export default function Index() {
               <input type="text" id="email" name="email" ref={emailRef} />
               <br />
               <label htmlFor="email">Password:</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                ref={passwordRef}
-              />
+              <input type="password" id="password" name="password" ref={passwordRef} />
               <br />
               <button type="submit">Login</button>
               {actionError?.errorCode && (

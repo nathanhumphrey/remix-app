@@ -1,13 +1,4 @@
-import {
-  Link,
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useCatch,
-} from 'remix';
+import { Link, Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useCatch } from 'remix';
 
 import globalStylesUrl from '~/styles/global.css';
 import darkStylesUrl from '~/styles/dark.css';
@@ -42,10 +33,7 @@ export function ErrorBoundary({ error }) {
           <h1>There was an error</h1>
           <p>{error.message}</p>
           <hr />
-          <p>
-            Hey, developer, you should replace this with what you want your
-            users to see.
-          </p>
+          <p>Hey, developer, you should replace this with what you want your users to see.</p>
         </div>
       </Layout>
     </Document>
@@ -57,17 +45,10 @@ export function CatchBoundary() {
   let message;
   switch (caught.status) {
     case 401:
-      message = (
-        <p>
-          Oops! Looks like you tried to visit a page that you do not have access
-          to.
-        </p>
-      );
+      message = <p>Oops! Looks like you tried to visit a page that you do not have access to.</p>;
       break;
     case 404:
-      message = (
-        <p>Oops! Looks like you tried to visit a page that does not exist.</p>
-      );
+      message = <p>Oops! Looks like you tried to visit a page that does not exist.</p>;
       break;
 
     default:
@@ -120,7 +101,10 @@ function Layout({ children }) {
                 <Link to="/">Home</Link>
               </li>
               <li>
-                <Link to={'/protected'}>Protected Page</Link>
+                <Link to="/signup">Sign Up Page</Link>
+              </li>
+              <li>
+                <Link to="/protected">Protected Page</Link>
               </li>
             </ul>
           </nav>

@@ -4,7 +4,7 @@ import { json, redirect } from 'remix';
 import type { AuthInterface, AuthSessionType, AuthUserType } from '.';
 
 // location of users.json file relative to build path NOT app
-const usersFile = '../../app/auth.server/users.json';
+const usersFile = path.join(__dirname, '../../app/auth.server/users.json');
 
 /**
  * DO NOT USE THIS IMPLEMENTATION IN PRODUCTION.
@@ -16,19 +16,16 @@ export class FileAuth implements AuthInterface<AuthUserType> {
   private users: AuthUserType[];
 
   constructor(private session: AuthSessionType) {
-    let rawdata = readFileSync(path.join(__dirname, usersFile));
+    let rawdata = readFileSync(usersFile);
     let users = JSON.parse(rawdata.toString());
     this.users = users;
   }
 
-  async createAccount(
-    user: AuthUserType,
-    redirectTo: string
-  ): Promise<Response> {
+  async createAccount(user: AuthUserType, redirectTo: string): Promise<Response> {
     if (!this.exists(user)) {
       user.id = UUID.generate();
       this.users.push(user);
-      writeFileSync(JSON.stringify(this.users), usersFile);
+      writeFileSync(usersFile, JSON.stringify(this.users));
       if (redirectTo) {
         return redirect(redirectTo);
       } else {
@@ -55,9 +52,7 @@ export class FileAuth implements AuthInterface<AuthUserType> {
 
   async login(user: AuthUserType): Promise<Response> {
     if (this.exists(user)) {
-      let match: AuthUserType = this.users
-        .filter((u) => user.username === u.username)
-        .pop()!;
+      let match: AuthUserType = this.users.filter((u) => user.username === u.username).pop()!;
 
       if (match?.password === user.password) {
         // stuff any required info into the user session
@@ -84,7 +79,7 @@ export class FileAuth implements AuthInterface<AuthUserType> {
     return false;
   }
 
-  async requireUser(request: Request): Promise<Response> {
+  async requireUser(request: Request, role?: string): Promise<Response> {
     // update to also check role claim if required
     if ((await this.user(request)) !== null) {
       return json(
@@ -119,7 +114,7 @@ export class FileAuth implements AuthInterface<AuthUserType> {
     if (id) {
       // _assuming_ the id exists, will cause an error otherwise
       user = this.users.find((u) => u.id === id)!;
-      return { id: user.id, username: user.username, name: user.name };
+      return { id: user.id, username: user.username, name: user.name, role: user?.role };
     } else {
       return null;
     }

@@ -1,11 +1,13 @@
-import { createCookieSessionStorage } from 'remix';
+import path from 'path';
+import { createFileSessionStorage } from 'remix';
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {
   throw new Error('SESSION_SECRET must be set');
 }
 
-export const { getSession, commitSession, destroySession } = createCookieSessionStorage({
+export const { getSession, commitSession, destroySession } = createFileSessionStorage({
+  dir: path.join(__dirname, '../../app/sessions'),
   cookie: {
     name: '__session',
     // normally you want this to be `secure: true`

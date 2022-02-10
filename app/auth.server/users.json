@@ -3,12 +3,14 @@
     "id": "92150af3-5e79-475b-b8a9-f634eb66af1a",
     "username": "jdoe@example.com",
     "name": "Jane Doe",
-    "password": "foobar"
+    "password": "foobar",
+    "role": "admin"
   },
   {
     "id": "fa9a3553-9c5a-4607-8020-dc1474dc5329",
     "username": "ckent@example.com",
     "name": "Clark Kent",
-    "password": "foobaz"
+    "password": "foobaz",
+    "role": "guest"
   }
 ]

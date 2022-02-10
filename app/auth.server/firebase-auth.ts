@@ -15,8 +15,33 @@ if (process.env.NODE_ENV === 'development') {
 export class FirebaseAuth implements AuthInterface<AuthUserType> {
   constructor(private session: AuthSessionType) {}
 
-  createAccount(user: AuthUserType): void {
-    throw new Error('createAcount: Method not implemented.');
+  async createAccount(user: AuthUserType, redirectTo?: string): Promise<Response> {
+    try {
+      const newUser = await auth.createUser({ email: user.username, password: user.password });
+      if (redirectTo) {
+        return redirect(redirectTo);
+      } else {
+        return json(
+          { status: 'success' },
+          {
+            status: 201,
+          }
+        );
+      }
+    } catch (error) {
+      // TODO: look into a modular logging package
+      console.error('auth/createAccount', `Could not create the account - ${error}`);
+      return json(
+        {
+          status: 'error',
+          errorCode: 'auth/createAccount',
+          errorMessage: `There was a problem creating the account`,
+        },
+        {
+          status: 500, //422
+        }
+      );
+    }
   }
 
   async login(user: AuthUserType): Promise<any> {
@@ -33,9 +58,24 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
           returnSecureToken: true,
         }),
       });
-
+      console.log('URL', URL);
       const authResponse: Response = await fetch(req);
       const creds: any = await authResponse.json();
+
+      // check for error
+      if (creds.error) {
+        return json(
+          {
+            status: 'error',
+            errorCode: 'auth/login',
+            errorMessage: `Invalid username or password`,
+          },
+          {
+            status: 422,
+          }
+        );
+      }
+
       // get the user to retrieve any custom claims (e.g. role)
       const firebaseUser = await auth.getUser(creds.localId);
       // expires in 5 days
@@ -45,12 +85,9 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
       // To only allow session cookie setting on recent sign-in, auth_time in ID token
       // can be checked to ensure user was recently signed in before creating a session cookie.
 
-      const sessionIdToken: string = await auth.createSessionCookie(
-        creds.idToken,
-        {
-          expiresIn,
-        }
-      );
+      const sessionIdToken: string = await auth.createSessionCookie(creds.idToken, {
+        expiresIn,
+      });
 
       // now create the session
       const sessionUser: AuthUserType = {
@@ -65,29 +102,36 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
         user: sessionUser,
       });
     } catch (error) {
+      // TODO: look into a modular logging package
+      console.error('auth/login', `Could not create the session cookie - ${error}`);
       return json(
         {
           status: 'error',
           errorCode: 'auth/login',
-          errorMessage: `Could not create the session cookie - ${error}`,
+          errorMessage: `There was a problem logging in`,
         },
         {
-          status: 422,
+          status: 500, //422
         }
       );
     }
   }
 
   logout(request: Request, redirectTo: string): any {
-    return this.session.destroyAuthSession(
-      request,
-      ['idToken', 'user'],
-      redirectTo
-    );
+    return this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo);
   }
 
-  exists(user: AuthUserType): boolean {
-    throw new Error('exists: Method not implemented.');
+  async exists(user: AuthUserType): Promise<boolean> {
+    try {
+      if (await auth.getUserByEmail(user.username)) {
+        return true;
+      }
+    } catch (error) {
+      // TODO: look into a modular logging package
+      console.error('auth/exists', `Could not check for account - ${error}`);
+    }
+
+    return false;
   }
 
   /**
@@ -97,52 +141,57 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
    * @returns
    */
   async requireUser(request: Request, role?: string): Promise<any> {
-    if ((await this.user(request)) !== null) {
-      // update to also check role claim if required
-      if (true) {
-        return json(
-          { status: 'success' },
-          {
-            status: 200,
-          }
-        );
-      }
-    }
-    return json(
-      {
-        status: 'error',
-        errorCode: 'auth/requireUser',
-        errorMessage: `Unauthorized access`,
-      },
-      {
-        status: 401,
-      }
-    );
-  }
-
-  async user(request: Request): Promise<AuthUserType | null> {
     const session = await this.session.getAuthSession(request);
     const idToken = session.get('idToken');
     const user: AuthUserType = JSON.parse(session.get('user') || null);
 
     if (!idToken || typeof idToken !== 'string') {
-      // throw will cause the error bondary to be hit, think about this
+      // TODO: throw will cause the error boundary to be hit, think about this
       // throw await this.session.destroyAuthSession(request);
-      return null;
+      return json(
+        {
+          status: 'error',
+          errorCode: 'auth/requireUser',
+          errorMessage: `Unauthorized access`,
+        },
+        {
+          status: 401,
+        }
+      );
     }
 
     // TODO: check role claim against parameter
     if (!user) {
-      return null;
+      return json(
+        {
+          status: 'error',
+          errorCode: 'auth/requireUser',
+          errorMessage: `Unauthorized access`,
+        },
+        {
+          status: 401,
+        }
+      );
     }
 
     try {
       await auth.verifySessionCookie(idToken);
-      return user;
+      return json(
+        { status: 'success' },
+        {
+          status: 200,
+        }
+      );
     } catch (error) {
       // TODO: find a way to display an expiry message to user
-      // to test, update expires time above
+      // to test, update expires time above -- perhaps just 'return' the response
       throw this.session.destroyAuthSession(request, ['idToken', 'user'], '/');
     }
+  }
+
+  async user(request: Request): Promise<AuthUserType | null> {
+    const session = await this.session.getAuthSession(request);
+    const user: AuthUserType = JSON.parse(session.get('user') || null);
+    return user;
   }
 }

@@ -7,5 +7,8 @@ node_modules
 public/build
 api/_build
 
+# app specific exceptions
 *.log
 env.sh
+*firebase-adminsdk*
+app/sessions/*

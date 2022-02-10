@@ -24,11 +24,7 @@ export type AuthSessionType = {
    * @param {string} redirectTo the location to redirect to on success
    * @returns {Promise<Response>} Promise object that resolves a Response
    */
-  destroyAuthSession(
-    request: Request,
-    keys: string[] | string,
-    redirectTo?: string
-  ): Promise<Response>;
+  destroyAuthSession(request: Request, keys: string[] | string, redirectTo?: string): Promise<Response>;
 };
 
 /**
@@ -88,9 +84,9 @@ export interface AuthInterface<User extends AuthUserType> {
   /**
    * Determines if a user account already exists.
    * @param {User} user the user account details
-   * @returns {boolean} true is the user exists, false otherwise
+   * @returns {boolean | Promise<boolean>} true if the user exists, false otherwise
    */
-  exists(user: User): boolean;
+  exists(user: User): boolean | Promise<boolean>;
   /**
    * Ensures that a user is signed in and optionally that the user holds
    * the necessary role for access to a resource.

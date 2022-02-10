@@ -10,8 +10,8 @@ export let meta = () => {
 
 export const loader: LoaderFunction = async ({ request }) => {
   try {
-    const authRes = await auth.requireUser(request);
-    const status: number = await authRes.status;
+    const authRes: Response = await auth.requireUser(request);
+    const status: number = authRes.status;
 
     if (status === 200) {
       return await auth.user(request);

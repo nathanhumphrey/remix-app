@@ -127,6 +127,8 @@ $ . .env.sh
 
 You should now be able to run the application in development or deploy to Vercel for production.
 
+---
+
 ## Original Remix README
 
 - [Remix Docs](https://remix.run/docs)
