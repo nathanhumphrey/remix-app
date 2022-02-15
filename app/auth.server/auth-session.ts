@@ -1,11 +1,14 @@
 import { json, redirect } from 'remix';
 import { getSession, commitSession, destroySession } from '~/util/session';
 import type { Session } from 'remix';
-import type { AuthSessionType } from '~/auth.server';
+import type { AuthSessionType } from './auth-types';
 
+/**
+ * Implementation of AuthSessionType
+ */
 export const authSession: AuthSessionType = {
-  async getAuthSession(request: Request): Promise<Session> {
-    return await getSession(request.headers.get('Cookie'));
+  getAuthSession(request: Request): Promise<Session> {
+    return getSession(request.headers.get('Cookie'));
   },
 
   async createAuthSession(data: any, redirectTo?: string): Promise<Response> {
@@ -50,22 +53,17 @@ export const authSession: AuthSessionType = {
     }
   },
 
-  async destroyAuthSession(
-    request: Request,
-    keys: string[] | string,
-    redirectTo?: string
-  ): Promise<any> {
+  async destroyAuthSession(request: Request, keys: string[] | string, redirectTo?: string): Promise<Response> {
     const session: Session = await getSession(request.headers.get('Cookie'));
 
     if (typeof keys === 'string') {
-      session.set(keys, '');
+      session.unset(keys);
     } else {
-      keys.forEach((key) => session.set(key, ''));
+      keys.forEach((key) => session.unset(key));
     }
     if (redirectTo) {
       return redirect(redirectTo, {
         headers: {
-          // 'Set-Cookie': await destroySession(session),
           'Set-Cookie': await commitSession(session),
         },
       });
@@ -74,7 +72,6 @@ export const authSession: AuthSessionType = {
         { status: 'success' },
         {
           headers: {
-            // 'Set-Cookie': await destroySession(session),
             'Set-Cookie': await commitSession(session),
           },
           status: 204,

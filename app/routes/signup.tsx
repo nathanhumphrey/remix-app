@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 import { json, Form, useActionData, useLoaderData, redirect } from 'remix';
-import type { ActionFunction, LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
+import type { ActionFunction, LoaderFunction } from 'remix';
+import type { AppError } from '~/util';
 
 export let meta = () => {
   return {
@@ -20,7 +21,7 @@ export const action: ActionFunction = async ({ request }) => {
 
     // TODO: form validation
     if (!email || email.trim() === '') {
-      return json(
+      return json<AppError>(
         {
           errorCode: 'signup/invalid-email',
           errorMessage: 'Email field cannot be empty',
@@ -30,7 +31,7 @@ export const action: ActionFunction = async ({ request }) => {
     }
 
     if (!password || !confirm || password.trim() === '' || password !== confirm) {
-      return json(
+      return json<AppError>(
         {
           errorCode: 'signup/invalid-password',
           errorMessage: 'Password fields cannot be empty and must match',
@@ -45,7 +46,7 @@ export const action: ActionFunction = async ({ request }) => {
     return auth.createAccount({ username: email, password }, '/');
   } catch (error) {
     console.error('signup/general', `Could not create the account - ${error}`);
-    return json(
+    return json<AppError>(
       {
         errorCode: 'signup/general',
         errorMessage: 'There was a problem creating the account',

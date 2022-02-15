@@ -9,17 +9,10 @@ export let meta = () => {
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  try {
-    const authRes: Response = await auth.requireUser(request);
-    const status: number = authRes.status;
-
-    if (status === 200) {
-      return await auth.user(request);
-    }
-  } catch (error) {
-    return redirect('/');
-  }
-  return redirect('/');
+  // page requires admin user role for access
+  await auth.requireUser(request, 'admin', '/');
+  // get the current auth user
+  return await auth.user(request);
 };
 
 export default function Secrets() {
@@ -29,10 +22,42 @@ export default function Secrets() {
     <div className="remix__page">
       <main>
         <h2>Protected Page</h2>
-        <p>Hello {user.name}, you must be logged in to view this page.</p>
+        <p>Hello {user.name}</p>
         <Form method="post" action="/logout">
           <button>Logout</button>
         </Form>
+        <section>
+          <h3>User Details</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>id</td>
+                <td>{user.id}</td>
+              </tr>
+              <tr>
+                <td>username</td>
+                <td>{user.username}</td>
+              </tr>
+              <tr>
+                <td>name</td>
+                <td>{user.name}</td>
+              </tr>
+              <tr>
+                <td>role</td>
+                <td>{user.role}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+        <section>
+          <h3>DB Users</h3>
+        </section>
       </main>
     </div>
   );

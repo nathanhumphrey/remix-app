@@ -1,9 +1,12 @@
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { json, redirect } from 'remix';
-import type { AuthInterface, AuthSessionType, AuthUserType } from '.';
+import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types';
 
 // location of users.json file relative to build path NOT app
+/**
+ * Location of local users.json file
+ */
 const usersFile = path.join(__dirname, '../../app/auth.server/users.json');
 
 /**

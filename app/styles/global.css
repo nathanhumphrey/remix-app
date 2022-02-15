@@ -8,8 +8,8 @@
   --color-links: hsl(213, 100%, 52%);
   --color-links-hover: hsl(213, 100%, 43%);
   --color-border: hsl(0, 0%, 82%);
-  --font-body: -apple-system, 'Segoe UI', Helvetica Neue, Helvetica, Roboto,
-    Arial, sans-serif, system-ui, 'Apple Color Emoji', 'Segoe UI Emoji';
+  --font-body: -apple-system, 'Segoe UI', Helvetica Neue, Helvetica, Roboto, Arial, sans-serif, system-ui,
+    'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
 html {
@@ -54,6 +54,19 @@ a:hover {
   text-decoration: underline;
 }
 
+button {
+  border: 2px solid var(--color-border);
+  padding: 0.5rem;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: var(--color-links-hover);
+  color: var(--color-background);
+}
+
 hr {
   display: block;
   height: 1px;
@@ -76,6 +89,16 @@ input:where([type='search']) {
   padding-left: 0.5em;
   background-color: hsl(0 0% 100% / 20%);
   color: var(--color-foreground);
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 0.5rem;
+  border: 2px solid var(--color-border);
 }
 
 .sr-only {

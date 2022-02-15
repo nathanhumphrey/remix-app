@@ -10,14 +10,7 @@ export const { getSession, commitSession, destroySession } = createFileSessionSt
   dir: path.join(__dirname, '../../app/sessions'),
   cookie: {
     name: '__session',
-    // normally you want this to be `secure: true`
-    // but that doesn't work on localhost for Safari
-    // https://web.dev/when-to-use-local-https/
-    secure: process.env.NODE_ENV === 'production',
     secrets: [sessionSecret],
-    sameSite: 'lax', // to help with CSRF
-    path: '/',
-    maxAge: 60 * 60 * 24 * 5, // 5 days
-    httpOnly: true,
+    sameSite: true,
   },
 });

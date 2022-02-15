@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 import { json, Form, useActionData, useLoaderData, Link } from 'remix';
-import type { ActionFunction, LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
+import type { ActionFunction, LoaderFunction } from 'remix';
+import type { AppError } from '~/util';
 
 export let meta = () => {
   return {
@@ -19,8 +20,9 @@ export const action: ActionFunction = async ({ request }) => {
 
     // TODO: form validation
     if (!email || email.trim() === '') {
-      return json(
+      return json<AppError>(
         {
+          status: 'error',
           errorCode: 'signup/invalid-email',
           errorMessage: 'Email field cannot be empty',
         },
@@ -29,8 +31,9 @@ export const action: ActionFunction = async ({ request }) => {
     }
 
     if (!password || password.trim() === '') {
-      return json(
+      return json<AppError>(
         {
+          status: 'error',
           errorCode: 'signup/invalid-password',
           errorMessage: 'Password field cannot be empty',
         },
@@ -41,8 +44,9 @@ export const action: ActionFunction = async ({ request }) => {
     // TODO: CSRF check
     return auth.login({ username: email, password });
   } catch (error) {
-    return json(
+    return json<AppError>(
       {
+        status: 'error',
         errorCode: 'login/general',
         errorMessage: 'There was a problem logging in',
       },

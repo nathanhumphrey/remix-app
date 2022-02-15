@@ -8,8 +8,8 @@
     "build": "remix build",
     "dev": "remix dev",
     "postinstall": "remix setup node",
-    "emulators": "npx firebase emulators:start --project development --only auth,firestore --import=./firestore-data",
-    "firestore-export": "npx firebase emulators:export ./firestore-data --project demo-remix-app"
+    "emulators": "npx firebase emulators:start --project development --only auth,firestore --import=./firebase-data",
+    "emulators:export": "npx firebase emulators:export ./firebase-data --project demo-remix-app"
   },
   "dependencies": {
     "@remix-run/react": "^1.1.3",

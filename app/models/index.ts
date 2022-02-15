@@ -1,3 +1,3 @@
-import { DBModel } from '../controllers/db-model';
+import { User } from './user';
 
-export { DBModel };
+export { User };

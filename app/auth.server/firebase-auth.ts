@@ -1,8 +1,11 @@
 import { json, redirect } from 'remix';
 import { auth } from '~/firebase';
-import type { AuthInterface, AuthSessionType, AuthUserType } from '.';
+import { AppError } from '~/util';
+import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types';
 
-// Required for use in REST API to sign in user
+/**
+ * Required API key for use in REST API to sign in user
+ */
 const API_KEY: string = process.env.FIREBASE_WEB_API_KEY!;
 let URL: string = '';
 
@@ -12,6 +15,9 @@ if (process.env.NODE_ENV === 'development') {
   URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
 }
 
+/**
+ * Firebase implementation of AuthInterface
+ */
 export class FirebaseAuth implements AuthInterface<AuthUserType> {
   constructor(private session: AuthSessionType) {}
 
@@ -29,13 +35,11 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
         );
       }
     } catch (error) {
-      // TODO: look into a modular logging package
-      console.error('auth/createAccount', `Could not create the account - ${error}`);
-      return json(
+      throw json<AppError>(
         {
           status: 'error',
           errorCode: 'auth/createAccount',
-          errorMessage: `There was a problem creating the account`,
+          errorMessage: `Could not create the account - ${error}`,
         },
         {
           status: 500, //422
@@ -58,7 +62,6 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
           returnSecureToken: true,
         }),
       });
-      console.log('URL', URL);
       const authResponse: Response = await fetch(req);
       const creds: any = await authResponse.json();
 
@@ -104,7 +107,7 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
     } catch (error) {
       // TODO: look into a modular logging package
       console.error('auth/login', `Could not create the session cookie - ${error}`);
-      return json(
+      return json<AppError>(
         {
           status: 'error',
           errorCode: 'auth/login',
@@ -127,8 +130,14 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
         return true;
       }
     } catch (error) {
-      // TODO: look into a modular logging package
-      console.error('auth/exists', `Could not check for account - ${error}`);
+      throw json<AppError>(
+        {
+          status: 'exception',
+          errorCode: 'auth/exists',
+          errorMessage: `Could not check for account - ${error}`,
+        },
+        { status: 500 }
+      );
     }
 
     return false;
@@ -137,18 +146,18 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
   /**
    *
    * @param request
+   * @param role {string | null} user role required to access the resource
    * @param redirectTo {string} where to redirect the user if the requirement fails
    * @returns
    */
-  async requireUser(request: Request, role?: string): Promise<any> {
+  async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
     const session = await this.session.getAuthSession(request);
     const idToken = session.get('idToken');
-    const user: AuthUserType = JSON.parse(session.get('user') || null);
+    let decodedClaims = null;
 
+    // Check for idToken for verification
     if (!idToken || typeof idToken !== 'string') {
-      // TODO: throw will cause the error boundary to be hit, think about this
-      // throw await this.session.destroyAuthSession(request);
-      return json(
+      throw json<AppError>(
         {
           status: 'error',
           errorCode: 'auth/requireUser',
@@ -160,32 +169,34 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
       );
     }
 
-    // TODO: check role claim against parameter
-    if (!user) {
-      return json(
-        {
-          status: 'error',
-          errorCode: 'auth/requireUser',
-          errorMessage: `Unauthorized access`,
-        },
-        {
-          status: 401,
-        }
-      );
-    }
-
+    // Attempt to verify the Firebase session
     try {
-      await auth.verifySessionCookie(idToken);
+      decodedClaims = await auth.verifySessionCookie(idToken);
+    } catch (error) {
+      // failed verification (e.g. Firebase session cookie revoked), unset session vars
+      throw await this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo ? redirectTo : undefined);
+    }
+
+    // Check if a role has been defined
+    if (role && role === decodedClaims.role) {
+      // passed all checks (verfiied and meets role, if any)
       return json(
         { status: 'success' },
         {
           status: 200,
         }
       );
-    } catch (error) {
-      // TODO: find a way to display an expiry message to user
-      // to test, update expires time above -- perhaps just 'return' the response
-      throw this.session.destroyAuthSession(request, ['idToken', 'user'], '/');
+    } else {
+      throw json<AppError>(
+        {
+          status: 'error',
+          errorCode: 'auth/requireUser',
+          errorMessage: `Unauthorized access`,
+        },
+        {
+          status: 401,
+        }
+      );
     }
   }
 

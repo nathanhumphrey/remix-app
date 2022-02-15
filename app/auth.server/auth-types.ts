@@ -39,7 +39,7 @@ export type AuthUserType = {
   /**
    * Unique name assigned to a user (typically an email)
    */
-  username: any;
+  username?: any;
   /**
    * User's password; for sign in and account creation
    */
@@ -91,12 +91,13 @@ export interface AuthInterface<User extends AuthUserType> {
    * Ensures that a user is signed in and optionally that the user holds
    * the necessary role for access to a resource.
    * @param {Request} request the resource request
-   * @param {string} role the role assigned to the user
+   * @param {string | null} role the role assigned to the user (pass null for any)
+   * @param {string} redirectTo where to redirect the user if the requirement fails
    * @returns {any} Typically a Promise object that resolves a Response
    */
-  requireUser(request: Request, role?: string): any;
+  requireUser(request: Request, role?: string | null, redirectTo?: string): any;
   /**
-   * Returns the currently signed in user
+   * Returns the currently authenticated user details
    * @param {Request} request the resource request
    * @returns {any} Return or resolve an AuthUserType object or null
    */
