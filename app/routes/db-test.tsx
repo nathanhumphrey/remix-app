@@ -26,18 +26,20 @@ export const loader: LoaderFunction = async ({ request }) => {
       break;
     case 'delete':
       // delete user
-      return null;
+      const user3 = new User('test@example.com');
+      user3.setId('testid');
+      return json(await users.deleteUser(user3));
       break;
     default:
       // execute a custom query
-      return json(
-        await users.customQuery({
-          collection: '', // TODO: find an elegant solution for this
-          where: { field: 'role', operator: '==', value: 'guest' },
-          limit: { max: 1 },
-        })
-      );
-    // fetch all users
-    //users.all());
+      // return json(
+      //   await users.customQuery({
+      //     collection: '', // TODO: find a more _elegant_ solution for this
+      //     where: { field: 'role', operator: '!=', value: 'guest' },
+      //     limit: { max: 2 },
+      //   })
+      // );
+      // fetch all users
+      return json(await users.all());
   }
 };

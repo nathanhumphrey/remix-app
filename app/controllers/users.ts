@@ -59,10 +59,10 @@ export class Users extends AbstractController<User> {
   /**
    * Updates a user in the database; requires an id
    * @param {User} user the user model to update in the database
-   * @returns {User} the user model with any updated default|derived field values
+   * @returns {User | User[]} the user(s) that have been updated
    * @throws Will throw an error if id is empty, user does not exist, or database call fails
    */
-  async updateUser(user: User): Promise<User> {
+  async updateUser(user: User): Promise<User | User[]> {
     if (user.getId()) {
       if (!(await this.getById(user.getId()))) {
         throw Error(`Users/updateUser - no user exists`);
@@ -79,17 +79,48 @@ export class Users extends AbstractController<User> {
           { collection: this.collection, where: { field: 'id', operator: '==', value: user.getId() } }
         );
         if (result.count() === 1) {
-          const u = result.rows().pop();
-          return new User(u.username, u?.role, u?.id, u.preferences);
-        } // TODO: need to return an array of User if not === 1
-        else {
-          console.log('RESULT:', result);
+          return result.rows().pop();
+        } else {
+          return result.rows();
         }
       } catch (error) {
         throw Error(`Users/updateUser - ${error}`);
       }
+    } else {
+      throw Error(`Users/updateUser - could not update user, missing required field`);
     }
-    throw Error(`Users/updateUser - could not update user, missing required field`);
+  }
+
+  /**
+   * Delete a user in the database; requires an id
+   * @param {User} user the user model to delete in the database
+   * @returns {User | User[]} the user(s) that have been deleted
+   * @throws Will throw an error if id is empty, user does not exist, or database call fails
+   */
+  async deleteUser(user: User): Promise<User | User[]> {
+    if (user.getId()) {
+      if (!(await this.getById(user.getId()))) {
+        throw Error(`Users/deleteUser - no user exists`);
+      }
+
+      try {
+        const result: DBResult = await this.db.executeDelete(
+          {
+            id: user.getId(),
+          },
+          { collection: this.collection, where: { field: 'id', operator: '==', value: user.getId() } }
+        );
+        if (result.count() === 1) {
+          return result.rows().pop();
+        } else {
+          return result.rows();
+        }
+      } catch (error) {
+        throw Error(`Users/deleteUser - ${error}`);
+      }
+    } else {
+      throw Error(`Users/deleteUser - could not update user, missing required field`);
+    }
   }
 
   /**

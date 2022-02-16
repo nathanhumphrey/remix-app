@@ -3,6 +3,10 @@ import { DBResult } from '~/controllers';
 import type { Firestore, OrderByDirection, Query, QuerySnapshot } from 'firebase-admin/firestore';
 import type { DBInterface, QueryOptions, OrderByOptions } from '~/controllers';
 
+// TODO: Update the database interface to return only a count for update and delete functions.
+// Update the DBResult type to split the count from the entities (e.g. can return a positive count
+// without any entities).
+
 class FirestoreDBResult extends DBResult {}
 
 export class FirestoreDB implements DBInterface {
@@ -59,23 +63,43 @@ export class FirestoreDB implements DBInterface {
       const results = [];
 
       if (docs.size === 1) {
-        docs.docs[0]?.ref.update(model, { exists: true });
+        await docs.docs[0]?.ref.update(model);
+        results.push((await docs.docs[0]?.ref.get()!).data());
+      } else if (docs.size > 1) {
+        docs.forEach(async (doc) => {
+          doc.ref.update(model);
+          results.push(await (await doc.ref.get()).data());
+        });
+      }
+      return new FirestoreDBResult(results);
+    } catch (error) {
+      // TODO: update error logging
+      console.error('firestoreDB/executeDelete', error);
+    }
+    return new FirestoreDBResult([]);
+  }
+
+  async executeDelete(model: any, options: QueryOptions): Promise<FirestoreDBResult> {
+    try {
+      const collectionRef = db.collection(options.collection);
+      const query = collectionRef.where(options.where?.field, options.where?.operator, options.where?.value);
+      const docs = await query.get();
+      const results = [];
+
+      if (docs.size === 1) {
+        await docs.docs[0]?.ref.delete({ exists: true });
         results.push(docs.docs[0]?.data());
       } else if (docs.size > 1) {
-        docs.forEach((doc) => {
-          doc.ref.update(model, { exists: true });
+        docs.forEach(async (doc) => {
+          await doc.ref.delete({ exists: true });
           results.push(doc.data());
         });
       }
       return new FirestoreDBResult(results);
     } catch (error) {
       // TODO: update error logging
-      console.error('firestoreDB/executeUpdate', error);
+      console.error('firestoreDB/executeDelete', error);
     }
-    return new FirestoreDBResult([]);
-  }
-
-  async executeDelete(model: any, options: QueryOptions): Promise<FirestoreDBResult> {
     return new FirestoreDBResult([]);
   }
 

@@ -4,16 +4,20 @@
 export abstract class DBResult {
   /**
    * Instantiates a new DBResult object.
-   * @param records? optional initial array of entities for this DB result
+   * @param {any[]} records? optional initial array of entities for this DB result
+   * @param {number} affected? the number of records
    */
-  constructor(protected records: any[]) {}
+  constructor(protected records: any[], protected affected?: number) {
+    this.records = records || [];
+    this.affected = affected || this.records.length;
+  }
 
   /**
-   * The number of entities in this DB result
-   * @returns {number} the number of entities in this result
+   * The number of entities affected in this DB result
+   * @returns {number} the number of entities affected in this result
    */
   count(): number {
-    return this.records.length;
+    return this.affected!;
   }
   /**
    * The entities in this DB result
