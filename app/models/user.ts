@@ -62,7 +62,7 @@ export class User {
    * @returns {string} the unique user id
    */
   getId(): string {
-    return this.username;
+    return this.id!;
   }
 
   /**

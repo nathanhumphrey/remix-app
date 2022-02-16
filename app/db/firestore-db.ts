@@ -1,7 +1,7 @@
-import { DBResult } from '~/controllers/controller-types';
 import { db } from '~/firebase';
-import type { Firestore, QuerySnapshot } from 'firebase-admin/firestore';
-import type { DBInterface, QueryOptions } from '~/controllers';
+import { DBResult } from '~/controllers';
+import type { Firestore, OrderByDirection, Query, QuerySnapshot } from 'firebase-admin/firestore';
+import type { DBInterface, QueryOptions, OrderByOptions } from '~/controllers';
 
 class FirestoreDBResult extends DBResult {}
 
@@ -9,34 +9,73 @@ export class FirestoreDB implements DBInterface {
   constructor(private db: Firestore) {}
 
   async executeQuery(options: QueryOptions): Promise<FirestoreDBResult> {
-    const usersRef = db.collection(options.collection);
-    let snapshot: QuerySnapshot;
-
     try {
+      const collectionRef = db.collection(options.collection);
+      let query: Query = collectionRef;
+
       if (options.where) {
         const w = options.where;
-        snapshot = await usersRef.where(w.field, w.operator, w.value).get();
-      } else {
-        snapshot = await usersRef.get();
+        query = query.where(w.field, w.operator, w.value);
       }
-      const models: any[] = snapshot.docs.map((doc) => doc.data());
+      if (options.orderBy) {
+        const o: OrderByOptions = options.orderBy;
+        query = query.orderBy(o.field, o?.direction as OrderByDirection);
+      }
+      if (options.limit) {
+        const l = options.limit;
+        query = query.limit(l.max);
+        if (l.offset) {
+          query = query.offset(l.offset);
+        }
+      }
+
+      const models: any[] = (await query.get()).docs.map((doc) => doc.data());
 
       return new FirestoreDBResult(models);
     } catch (error) {
-      console.error(error);
+      // TODO: update error logging
+      console.error('firestoreDB/executeQuery', error);
     }
     return new FirestoreDBResult([]);
   }
 
-  async executeInsert(): Promise<FirestoreDBResult> {
+  async executeInsert(model: any, options: QueryOptions): Promise<FirestoreDBResult> {
+    try {
+      const collectionRef = db.collection(options.collection);
+      const inserted = await (await (await collectionRef.add(model)).get()).data();
+      return new FirestoreDBResult([inserted]);
+    } catch (error) {
+      // TODO: update error logging
+      console.error('firestoreDB/executeInsert', error);
+    }
     return new FirestoreDBResult([]);
   }
 
-  async executeUpdate(): Promise<FirestoreDBResult> {
+  async executeUpdate(model: any, options: QueryOptions): Promise<FirestoreDBResult> {
+    try {
+      const collectionRef = db.collection(options.collection);
+      const query = collectionRef.where(options.where?.field, options.where?.operator, options.where?.value);
+      const docs = await query.get();
+      const results = [];
+
+      if (docs.size === 1) {
+        docs.docs[0]?.ref.update(model, { exists: true });
+        results.push(docs.docs[0]?.data());
+      } else if (docs.size > 1) {
+        docs.forEach((doc) => {
+          doc.ref.update(model, { exists: true });
+          results.push(doc.data());
+        });
+      }
+      return new FirestoreDBResult(results);
+    } catch (error) {
+      // TODO: update error logging
+      console.error('firestoreDB/executeUpdate', error);
+    }
     return new FirestoreDBResult([]);
   }
 
-  async executeDelete(): Promise<FirestoreDBResult> {
+  async executeDelete(model: any, options: QueryOptions): Promise<FirestoreDBResult> {
     return new FirestoreDBResult([]);
   }
 

@@ -27,10 +27,20 @@ export abstract class DBResult {
 /**
  * Represents the type used to define a where/having condition
  */
-type ConditionType = {
+export type Condition = {
   field: any;
   operator: any;
   value: any;
+};
+
+export type OrderByOptions = {
+  field: string;
+  direction?: 'asc' | 'desc';
+};
+
+export type LimitOptions = {
+  max: number;
+  offset?: number;
 };
 
 /**
@@ -41,9 +51,11 @@ export type QueryOptions = {
    * The name assigned to the collection of entities (e.g. table name, collection ref, etc.)
    */
   collection: string;
-  where?: ConditionType;
+  where?: Condition;
   groupBy?: string;
-  having?: ConditionType;
+  orderBy?: OrderByOptions;
+  limit?: LimitOptions;
+  having?: Condition;
 };
 
 /**
@@ -55,7 +67,7 @@ export interface DBInterface {
    * @param {QueryOptions} options optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeQuery<T>(queryOptions?: QueryOptions): Promise<DBResult>;
+  executeQuery(queryOptions?: QueryOptions): Promise<DBResult>;
   /**
    * Inserts an entity or entities into the database
    * @template Model
@@ -63,7 +75,7 @@ export interface DBInterface {
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeInsert<T>(model: T | T[], queryOptions?: QueryOptions): Promise<DBResult>;
+  executeInsert(model: any | any[], queryOptions?: QueryOptions): Promise<DBResult>;
   /**
    * Updates an entity in the database
    * @template Model
@@ -71,7 +83,7 @@ export interface DBInterface {
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeUpdate<T>(model: T, queryOptions?: QueryOptions): Promise<DBResult>;
+  executeUpdate(model: any, queryOptions?: QueryOptions): Promise<DBResult>;
   /**
    * Deletes an entity from the database
    * @template Model
@@ -79,7 +91,7 @@ export interface DBInterface {
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeDelete<T>(model: T, queryOptions?: QueryOptions): Promise<DBResult>;
+  executeDelete(model: any, queryOptions?: QueryOptions): Promise<DBResult>;
 }
 
 /**
