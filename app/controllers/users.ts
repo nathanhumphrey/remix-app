@@ -2,6 +2,9 @@ import { User } from '~/models';
 import { AbstractController, DBInterface, QueryOptions } from './controller-types';
 import type { DBResult } from './controller-types';
 
+/**
+ * Only two supported options for retrieving all users: by username and/or by role
+ */
 type AllUsersFilterType = {
   username?: string;
   role?: string;
@@ -189,6 +192,11 @@ export class Users extends AbstractController<User> {
     return this.all({ username });
   }
 
+  /**
+   * Provides a way to submit a custom users query to the database.
+   * @param {QueryOptions} options query options
+   * @returns {User[]} an array of matched users
+   */
   async customQuery(options?: QueryOptions): Promise<User[]> {
     const records = await this.db.executeQuery({ ...options, collection: this.collection });
     // Convert the records into the requried User type

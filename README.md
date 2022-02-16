@@ -1,17 +1,19 @@
-# Multitier Development with Remix (v0.0.1)
+# Structured Layout for Remix Development
 
-This project contains the structure for building an application on (what I'm calling) the Remix platform. The plan is for this project to provide a _slightly_ biased "convention over configuration" setup for a Remix project (you will still be free to implement most of the application how you'd like). In other words, this project is an itch for me to scratch. Feel free to take/modify/use it however you like.
+This project provides additional structure for building an application with [Remix](https://remix.run). This project provides a _slightly_ biased "convention over configuration" setup for a Remix project (much of the implementation for any application will have to be developed). In other words, this project is an itch for me to scratch. Feel free to take/modify/use it however you like.
 
-The two main requirements I'm aiming to meet are:
+The two main requirements the project aims to meet are:
 
 1. provide an application directory structure to support multitier development
-1. define interfaces for easier plug-n-play integration
+1. define general interfaces and types for easier plug-n-play integration
 
 Initialize the project via npm:
 
 ```sh
 $ npm i
 ```
+
+_One general note, the implementations included with this project separate the auth feature from the database feature. Which is to say, the Firestore users collection is not utilized for authentication -- it is included for database access demonstration purposes only._
 
 ## Directory Structure
 
@@ -69,11 +71,11 @@ This file exports `auth: AuthInterface` for use in the application.
 
 ### /app/controllers/
 
-The controller implementation is left to the developer. There are many different methodologies that can impact the development of controllers, and this project doesn't seek to limit them. The pattern that is followed in this starter package is to define the DBInterface for controllers in this directory. The reasoning behind this decision is to allow for development of the use case controllers to happen without accounting for the database implementation -- in other words, the database shouldn't impact how the controllers are developed. Implement the classes and interfaces that work best for your setup.
+The controller implementation is left to the developer. There are many different methodologies that can impact the development of controllers, and this project doesn't seek to limit them. The pattern that is followed in this starter package is to define the DBInterface for controllers in this directory. The reasoning behind this decision is to allow for development of the use case controllers to happen without accounting for the database implementation -- in other words, the database shouldn't impact how the controllers are developed. Implement the classes and interfaces that work best for your setup. This directory contains the following files:
 
 #### [`controller-types.ts`](app/controllers/controller-types.ts)
 
-This file exports `abstract class DBRecord<Model>`, `interface DBInterface`, and `abstract class AbstractController<Model>`. These types are provided as examples only; you should feel free to scrap them and provide your own implementation.
+This file exports `abstract class DBResult`, `type Condition`, `type OrderByOptions`, `type LimitOptions` `type QueryOptions`, `interface DBInterface`, and `abstract class AbstractController<Model>`. These types are provided as examples only; feel free to update or scrap them and provide your own implementation if necessary.
 
 #### [`users.ts`](app/controllers/users.ts)
 
@@ -81,11 +83,11 @@ This file exports `Users: AbstractController<User>`, which is an example impleme
 
 #### [`index.ts`](app/controllers/index.ts)
 
-This file exports `DBInterface` and any controller implementations (e.g. `users: Users` in the starter) for use in the application.
+This file exports `DBResult`, `Condition`, `DBInterface`, `LimitOptions`, `OrderByOptions`, and `QueryOptions` and any controller implementations (e.g. `users: Users` in the starter) for use in the application.
 
 ### /app/db/
 
-Database implementation resides in this directory. In keeping with the explanation above regarding controllers, any exported database implementation should implement the database interface exported from `/app/controllers`. In this way, you could develop several implementations (e.g. PostgreSQL, MySQL, Firestore, etc.) and the higher application wouldn't have to be updated to accommodate (lofty goals, I know).
+Database implementation resides in this directory. In keeping with the explanation above regarding controllers, any exported database implementation should implement the database interface exported from `/app/controllers`. In this way, you could develop several implementations (e.g. PostgreSQL, MySQL, Firestore, etc.) and the higher application wouldn't have to be updated to accommodate (lofty goals, I know). This directory contains the following files:
 
 #### [`firestore-db.ts`](app/db/firestore-db.ts)
 
@@ -97,7 +99,7 @@ This file exports `db:DBInterface` for use in the application.
 
 ### /app/models/
 
-Business entities for the application should reside in this directory.
+Business entities for the application should reside in this directory. This directory contains the following files:
 
 #### [`user.ts`](app/models/user.ts)
 
@@ -107,9 +109,33 @@ This file exports `User`, an example model for use in the starter. Feel to free 
 
 This file exports any model implementations (e.g. `User` in the starter) for use in the application.
 
+### /app/routes/
+
+The project ships with some basic routes to demonstrate auth and database functionality. Modify or remove them as necessary. This directory contains the following files:
+
+#### [`index.tsx`](app/routes/index.tsx)
+
+This route provides a login form if a user has not logged in, and a welcome message if the user is logged in. You can view sample users for file-based auth in the [`app/auth.server/users.json`](app/auth.server/users.json) file, or via the Firebase Emulatory UI.
+
+#### [`logout.tsx`](app/routes/logout.tsx)
+
+This route does not render a component. It only serves as a POST (i.e. action) endpoint to logout a user.
+
+#### [`protected.tsx`](app/routes/protected.tsx)
+
+This route is protected and requires a user to be authenticated for access.
+
+#### [`signup.tsx`](app/routes/signup.tsx)
+
+This route is renders a sign up form if the user is not authenticated; it redirects to the index route if a user is already logged in.
+
+#### [`db-test.tsx`](app/routes/db-test.tsx)
+
+This route does not render a component and is included for DB access **demonstration** only. Ensure this file is removed prior to any form of deployment.
+
 ### /app/util/
 
-This component provides general application utilities.
+This component provides general application utilities. This directory contains the following files:
 
 #### [`error-types.ts`](app/util/error-types.ts)
 
@@ -121,7 +147,7 @@ This file exports any general utility types, classes, or functions for use in th
 
 ### /app/util/session/
 
-This component provides the necessary session management object for the application. Two implementations are provided: cookie and file.
+This component provides the necessary session management object for the application. Two implementations are provided: cookie and file. This directory contains the following files:
 
 #### [`cookie-session.server.ts`](app/util/session/cookie-session.server.ts)
 
