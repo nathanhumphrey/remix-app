@@ -1,5 +1,5 @@
 import { json, redirect } from 'remix';
-import { getSession, commitSession, destroySession } from '~/util/session';
+import { getSession, commitSession } from '~/util/session';
 import type { Session } from 'remix';
 import type { AuthSessionType } from './auth-types';
 

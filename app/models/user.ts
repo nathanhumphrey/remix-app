@@ -14,14 +14,11 @@ export class User {
    * @param {PreferenceType} preferences any user preferences
    */
   constructor(
-    private username: string,
-    private role?: string,
-    private id?: string,
+    private username: string = '',
+    private role: string = '',
+    private id: string = '',
     private preferences?: PreferenceType | null
   ) {
-    this.username = username;
-    this.role = role || '';
-    this.id = id || '';
     this.preferences = preferences || null;
   }
 
@@ -46,7 +43,7 @@ export class User {
    * @returns {string} the user role
    */
   getRole(): string {
-    return this.role!;
+    return this.role;
   }
 
   /**
@@ -62,7 +59,7 @@ export class User {
    * @returns {string} the unique user id
    */
   getId(): string {
-    return this.id!;
+    return this.id;
   }
 
   /**
@@ -77,8 +74,8 @@ export class User {
    * Get user preferences
    * @returns {PreferenceType} a shallow copy of the user preferences
    */
-  getPreferences(): {} {
-    return { ...this.preferences! };
+  getPreferences(): PreferenceType {
+    return { ...this.preferences };
   }
 
   /**

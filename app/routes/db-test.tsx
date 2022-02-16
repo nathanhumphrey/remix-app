@@ -7,11 +7,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);
   const op = url.searchParams.get('op');
 
+  let user;
+
   switch (op) {
     case 'create':
       // create user
-      const user1 = new User('test@example.com', 'guest', 'testid', { theme: 'light' });
-      return json(await users.createUser(user1));
+      user = new User('test@example.com', 'guest', 'testid', { theme: 'light' });
+      return json(await users.create(user));
       break;
     case 'read':
       // geta a user by username or id
@@ -20,26 +22,26 @@ export const loader: LoaderFunction = async ({ request }) => {
       break;
     case 'update':
       // update user
-      const user2 = new User('test@example.com', 'super', 'testid', { theme: 'dark' });
-      return json(await users.updateUser(user2));
+      user = new User('test@example.com', 'admin', 'testid', { theme: 'light' });
+      return json(await users.update(user));
       // return null;
       break;
     case 'delete':
       // delete user
-      const user3 = new User('test@example.com');
-      user3.setId('testid');
-      return json(await users.deleteUser(user3));
+      user = new User('test@example.com');
+      user.setId('testid');
+      return json(await users.delete(user));
       break;
     default:
       // execute a custom query
       // return json(
-      //   await users.customQuery({
+      //   await users.read({
       //     collection: '', // TODO: find a more _elegant_ solution for this
-      //     where: { field: 'role', operator: '!=', value: 'guest' },
+      //     where: { field: 'role', operator: '!=', value: 'super' },
       //     limit: { max: 2 },
       //   })
       // );
-      // fetch all users
-      return json(await users.all());
+      // fetch all users by role
+      return json(await users.allByRole('admin'));
   }
 };

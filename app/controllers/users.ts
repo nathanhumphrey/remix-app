@@ -2,12 +2,11 @@ import { User } from '~/models';
 import { AbstractController, DBInterface, QueryOptions } from './controller-types';
 import type { DBResult } from './controller-types';
 
-/**
- * Only two supported options for retrieving all users: by username and/or by role
- */
-type AllUsersFilterType = {
-  username?: string;
-  role?: string;
+type UserType = {
+  id: string;
+  username: string;
+  role: string;
+  preferences: object;
 };
 
 /**
@@ -29,7 +28,7 @@ export class Users extends AbstractController<User> {
    * @returns {User} the user model with any updated default|derived field values
    * @throws Will throw an error if username is empty, user already exists, or database call fails
    */
-  async createUser(user: User): Promise<User> {
+  async create(user: User): Promise<User> {
     if (user.getUsername()) {
       if (await this.getByUsername(user.getUsername())) {
         throw Error(`Users/createUser - user already exists`);
@@ -49,9 +48,9 @@ export class Users extends AbstractController<User> {
           { collection: this.collection }
         );
         if (result.count() === 1) {
-          const u = result.rows().pop();
+          const u = result.rows().pop() as UserType;
           return new User(u.username, u?.role, u?.id, u.preferences);
-        } // TODO: what if the count is NOT 1?
+        } // TODO: what if the count is NOT 1? ... it shouldn't be, but ...
       } catch (error) {
         throw Error(`Users/createUser - ${error}`);
       }
@@ -60,12 +59,26 @@ export class Users extends AbstractController<User> {
   }
 
   /**
+   * Provides a way to submit a custom users query to the database.
+   * @param {QueryOptions} options query options
+   * @returns {User[]} an array of matched users
+   */
+  async read(options?: QueryOptions): Promise<User[]> {
+    const records = await this.db.executeQuery({ ...options, collection: this.collection });
+    // Convert the records into the requried User type
+    return records.rows().map((record) => {
+      const u = record as UserType;
+      return new User(u.username, u.role, u.id, u.preferences);
+    });
+  }
+
+  /**
    * Updates a user in the database; requires an id
    * @param {User} user the user model to update in the database
    * @returns {User | User[]} the user(s) that have been updated
    * @throws Will throw an error if id is empty, user does not exist, or database call fails
    */
-  async updateUser(user: User): Promise<User | User[]> {
+  async update(user: User): Promise<User | User[]> {
     if (user.getId()) {
       if (!(await this.getById(user.getId()))) {
         throw Error(`Users/updateUser - no user exists`);
@@ -81,10 +94,15 @@ export class Users extends AbstractController<User> {
           },
           { collection: this.collection, where: { field: 'id', operator: '==', value: user.getId() } }
         );
+
+        const users = result.rows().map((record) => {
+          const u = record as UserType;
+          return new User(u.username as string, u.role, u.id, u.preferences);
+        });
         if (result.count() === 1) {
-          return result.rows().pop();
+          return users.pop() as User;
         } else {
-          return result.rows();
+          return users;
         }
       } catch (error) {
         throw Error(`Users/updateUser - ${error}`);
@@ -100,7 +118,7 @@ export class Users extends AbstractController<User> {
    * @returns {User | User[]} the user(s) that have been deleted
    * @throws Will throw an error if id is empty, user does not exist, or database call fails
    */
-  async deleteUser(user: User): Promise<User | User[]> {
+  async delete(user: User): Promise<User | User[]> {
     if (user.getId()) {
       if (!(await this.getById(user.getId()))) {
         throw Error(`Users/deleteUser - no user exists`);
@@ -113,10 +131,14 @@ export class Users extends AbstractController<User> {
           },
           { collection: this.collection, where: { field: 'id', operator: '==', value: user.getId() } }
         );
+        const users = result.rows().map((record) => {
+          const u = record as UserType;
+          return new User(u.username as string, u.role, u.id, u.preferences);
+        });
         if (result.count() === 1) {
-          return result.rows().pop();
+          return users.pop() as User;
         } else {
-          return result.rows();
+          return users;
         }
       } catch (error) {
         throw Error(`Users/deleteUser - ${error}`);
@@ -132,13 +154,14 @@ export class Users extends AbstractController<User> {
    * @returns {User | null} the user retrieved from the database or null if no match was found
    */
   async getById(id: string): Promise<User | null> {
-    const record = await this.db.executeQuery({
+    const result = await this.db.executeQuery({
       collection: this.collection,
       where: { field: 'id', operator: '==', value: id },
     });
 
-    if (record.count() === 1) {
-      return record.rows().pop();
+    if (result.count() === 1) {
+      const u = result.rows().pop() as UserType;
+      return new User(u.username as string, u.role, u.id, u.preferences);
     } else {
       return null;
     }
@@ -150,28 +173,17 @@ export class Users extends AbstractController<User> {
    * @returns {User | null} the user retrieved from the database or null if no match was found
    */
   async getByUsername(username: string): Promise<User | null> {
-    const record = await this.db.executeQuery({
+    const result = await this.db.executeQuery({
       collection: this.collection,
       where: { field: 'username', operator: '==', value: username },
     });
 
-    if (record.count() === 1) {
-      return record.rows().pop();
+    if (result.count() === 1) {
+      const u = result.rows().pop() as UserType;
+      return new User(u.username as string, u.role, u.id, u.preferences);
     } else {
       return null;
     }
-  }
-
-  /**
-   * Retrieves users from the database.
-   * @param {AllUsersFilterType} filter optional filter object (username and/or role) for narrowing the search
-   * @returns {User[]} an array of matched users
-   */
-  async all(filter?: AllUsersFilterType): Promise<User[]> {
-    // TODO: update to make use of filter object
-    const records = await this.db.executeQuery({ collection: this.collection });
-    // Convert the records into the requried User type
-    return records.rows().map((record: any) => new User(record.username, record.role, record.id, record.preferences));
   }
 
   /**
@@ -180,26 +192,6 @@ export class Users extends AbstractController<User> {
    * @returns
    */
   allByRole(role: string) {
-    return this.all({ role });
-  }
-
-  /**
-   * Facade method for all({ username })
-   * @param role the role to filter by
-   * @returns
-   */
-  allByUsername(username: string) {
-    return this.all({ username });
-  }
-
-  /**
-   * Provides a way to submit a custom users query to the database.
-   * @param {QueryOptions} options query options
-   * @returns {User[]} an array of matched users
-   */
-  async customQuery(options?: QueryOptions): Promise<User[]> {
-    const records = await this.db.executeQuery({ ...options, collection: this.collection });
-    // Convert the records into the requried User type
-    return records.rows().map((record: any) => new User(record.username, record.role, record.id, record.preferences));
+    return this.read({ collection: this.collection, where: { field: 'role', operator: '==', value: role } });
   }
 }

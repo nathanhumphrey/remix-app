@@ -1,4 +1,4 @@
-import { Form, redirect, useLoaderData } from 'remix';
+import { Form, useLoaderData } from 'remix';
 import type { LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
 

@@ -1,13 +1,13 @@
 /**
  * Abstract DBResult to represent results from any database.
  */
-export abstract class DBResult {
+export class DBResult {
   /**
    * Instantiates a new DBResult object.
-   * @param {any[]} records? optional initial array of entities for this DB result
+   * @param {object[]} records? optional initial array of entities for this DB result
    * @param {number} affected? the number of records
    */
-  constructor(protected records: any[], protected affected?: number) {
+  constructor(protected records: object[], protected affected: number = 0) {
     this.records = records || [];
     this.affected = affected || this.records.length;
   }
@@ -17,13 +17,13 @@ export abstract class DBResult {
    * @returns {number} the number of entities affected in this result
    */
   count(): number {
-    return this.affected!;
+    return this.affected;
   }
   /**
    * The entities in this DB result
-   * @returns {any[]} an arry of entity objects in this result
+   * @returns {object[]} an arry of entity objects in this result
    */
-  rows(): any[] {
+  rows(): object[] {
     return this.records;
   }
 }
@@ -32,9 +32,9 @@ export abstract class DBResult {
  * Represents the type used to define a where/having condition
  */
 export type Condition = {
-  field: any;
-  operator: any;
-  value: any;
+  field: unknown;
+  operator: unknown;
+  value: unknown;
 };
 
 export type OrderByOptions = {
@@ -79,7 +79,7 @@ export interface DBInterface {
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeInsert(model: any | any[], queryOptions?: QueryOptions): Promise<DBResult>;
+  executeInsert(model: object | object[], queryOptions?: QueryOptions): Promise<DBResult>;
   /**
    * Updates an entity in the database
    * @template Model
@@ -87,7 +87,7 @@ export interface DBInterface {
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeUpdate(model: any, queryOptions?: QueryOptions): Promise<DBResult>;
+  executeUpdate(model: object, queryOptions?: QueryOptions): Promise<DBResult>;
   /**
    * Deletes an entity from the database
    * @template Model
@@ -95,7 +95,7 @@ export interface DBInterface {
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeDelete(model: any, queryOptions?: QueryOptions): Promise<DBResult>;
+  executeDelete(model: object, queryOptions?: QueryOptions): Promise<DBResult>;
 }
 
 /**
@@ -108,4 +108,8 @@ export abstract class AbstractController<Model> {
    * @param {DBInterface} db the database reference
    */
   constructor(protected collection: string, protected db: DBInterface) {}
+  abstract create(model: Model): Promise<Model>;
+  abstract read(options?: QueryOptions): Promise<Model[]>;
+  abstract update(user: Model): Promise<Model | Model[]>;
+  abstract delete(user: Model): Promise<Model | Model[]>;
 }
