@@ -1,5 +1,7 @@
 # Structured Layout for Remix Development with Firebase
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE.md)
+
 This project provides additional structure for building an application with [Remix](https://remix.run). This project provides a _slightly_ biased "convention over configuration" setup for a Remix project using [Firebase](https://firebase.google.com) (much of the implementation for any application will have to be developed). In other words, this project is an itch for me to scratch. Feel free to take/modify/use it however you like.
 
 The two main requirements the project aims to meet are:
@@ -227,6 +229,10 @@ $ . .env.sh
 ```
 
 You should now be able to run the application in development or deploy to Vercel for production.
+
+## License
+
+This repository is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 

@@ -1,7 +1,6 @@
 import { json } from 'remix';
 import { users } from '~/controllers';
 import type { LoaderFunction } from 'remix';
-import { User } from '~/models';
 
 export const loader: LoaderFunction = async ({ request }) => {
   const url = new URL(request.url);

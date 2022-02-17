@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { json, redirect } from 'remix';
+import { AppError } from '~/util';
 import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types';
 
 // location of users.json file relative to build path NOT app
@@ -55,9 +56,9 @@ export class FileAuth implements AuthInterface<AuthUserType> {
 
   async login(user: AuthUserType): Promise<Response> {
     if (this.exists(user)) {
-      let match: AuthUserType = this.users.filter((u) => user.username === u.username).pop()!;
+      let match: AuthUserType | undefined = this.users.find((u) => user.username === u.username);
 
-      if (match?.password === user.password) {
+      if (match && match.password === user.password) {
         // stuff any required info into the user session
         return this.session.createAuthSession({ id: match.id });
       }
@@ -82,42 +83,46 @@ export class FileAuth implements AuthInterface<AuthUserType> {
     return false;
   }
 
-  async requireUser(request: Request, role?: string): Promise<Response> {
+  async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
     // update to also check role claim if required
-    if ((await this.user(request)) !== null) {
+    const user = await this.user(request);
+    if (user === null || (role && role !== user?.role)) {
+      if (redirectTo) {
+        throw redirect(redirectTo);
+      } else {
+        throw json<AppError>(
+          {
+            status: 'error',
+            errorCode: 'auth/requireUser',
+            errorMessage: `Unauthorized access`,
+          },
+          {
+            status: 401,
+          }
+        );
+      }
+    } else {
       return json(
         { status: 'success' },
         {
           status: 200,
         }
       );
-    } else {
-      return json(
-        {
-          status: 'error',
-          errorCode: 'auth/requireUser',
-          errorMessage: `Unauthorized access`,
-        },
-        {
-          status: 401,
-        }
-      );
     }
   }
 
-  logout(request: Request, redirectTo: string = '/'): Promise<Response> {
+  logout(request: Request, redirectTo = '/'): Promise<Response> {
     return this.session.destroyAuthSession(request, ['id'], redirectTo);
   }
 
   async user(request: Request): Promise<AuthUserType | null> {
     const session = await this.session.getAuthSession(request);
     const id = session.get('id');
-    let user: AuthUserType;
+    // let user: AuthUserType;
 
     if (id) {
       // _assuming_ the id exists, will cause an error otherwise
-      user = this.users.find((u) => u.id === id)!;
-      return { id: user.id, username: user.username, name: user.name, role: user?.role };
+      return this.users.find((u) => u.id === id) || null;
     } else {
       return null;
     }

@@ -1,4 +1,4 @@
-import { Form, useLoaderData } from 'remix';
+import { Form, Outlet, useLoaderData } from 'remix';
 import type { LoaderFunction } from 'remix';
 import { auth } from '~/auth.server';
 
@@ -11,12 +11,13 @@ export let meta = () => {
 export const loader: LoaderFunction = async ({ request }) => {
   // page requires admin user role for access
   await auth.requireUser(request, 'admin', '/');
+
   // get the current auth user
   return await auth.user(request);
 };
 
 export default function Secrets() {
-  const user = useLoaderData();
+  const user = useLoaderData() || { username: 'foo', id: 'bar', name: 'baz', role: 'shazam' };
 
   return (
     <div className="remix__page">
@@ -57,6 +58,7 @@ export default function Secrets() {
         </section>
         <section>
           <h3>DB Users</h3>
+          <Outlet />
         </section>
       </main>
     </div>

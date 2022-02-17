@@ -1,3 +1,4 @@
+import { DecodedIdToken } from 'firebase-admin/auth';
 import { json, redirect } from 'remix';
 import { auth } from '~/firebase';
 import { AppError } from '~/util';
@@ -6,8 +7,8 @@ import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types'
 /**
  * Required API key for use in REST API to sign in user
  */
-const API_KEY: string = process.env.FIREBASE_WEB_API_KEY!;
-let URL: string = '';
+const API_KEY: string | undefined = process.env.FIREBASE_WEB_API_KEY;
+let URL = '';
 
 if (process.env.NODE_ENV === 'development') {
   URL = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=123`;
@@ -23,7 +24,7 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
 
   async createAccount(user: AuthUserType, redirectTo?: string): Promise<Response> {
     try {
-      const newUser = await auth.createUser({ email: user.username, password: user.password });
+      await auth.createUser({ email: user.username, password: user.password });
       if (redirectTo) {
         return redirect(redirectTo);
       } else {
@@ -153,39 +154,30 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
   async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
     const session = await this.session.getAuthSession(request);
     const idToken = session.get('idToken');
-    let decodedClaims = null;
+    let decodedClaims: DecodedIdToken;
 
-    // Check for idToken for verification
-    if (!idToken || typeof idToken !== 'string') {
-      throw json<AppError>(
-        {
-          status: 'error',
-          errorCode: 'auth/requireUser',
-          errorMessage: `Unauthorized access`,
-        },
-        {
-          status: 401,
-        }
-      );
+    if (idToken && typeof idToken === 'string') {
+      // Attempt to verify the Firebase session
+      try {
+        decodedClaims = await auth.verifySessionCookie(idToken);
+      } catch (error) {
+        // Failed verification (e.g. Firebase session cookie revoked), unset session vars
+        throw await this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo ? redirectTo : undefined);
+      }
+
+      if (!role || role === decodedClaims?.role) {
+        return json(
+          { status: 'success' },
+          {
+            status: 200,
+          }
+        );
+      }
     }
 
-    // Attempt to verify the Firebase session
-    try {
-      decodedClaims = await auth.verifySessionCookie(idToken);
-    } catch (error) {
-      // failed verification (e.g. Firebase session cookie revoked), unset session vars
-      throw await this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo ? redirectTo : undefined);
-    }
-
-    // Check if a role has been defined
-    if (role && role === decodedClaims.role) {
-      // passed all checks (verfiied and meets role, if any)
-      return json(
-        { status: 'success' },
-        {
-          status: 200,
-        }
-      );
+    // Failed to verify access
+    if (redirectTo) {
+      throw redirect(redirectTo);
     } else {
       throw json<AppError>(
         {
