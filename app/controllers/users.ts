@@ -3,10 +3,10 @@ import { AbstractController, DBInterface, QueryOptions } from './controller-type
 import type { DBResult } from './controller-types';
 
 type UserType = {
-  id: string;
-  username: string;
-  role: string;
-  preferences: object;
+  id?: string;
+  username?: string;
+  role?: string;
+  preferences?: object;
 };
 
 /**
@@ -72,7 +72,7 @@ export class Users extends AbstractController<UserType, User> {
   async update(userData: UserType): Promise<User | User[]> {
     if (userData.id) {
       if (!(await this.getById(userData.id))) {
-        throw Error(`Users/updateUser - no user exists`);
+        throw Error(`Users/updateUser - user does not exist`);
       }
 
       try {
@@ -104,7 +104,7 @@ export class Users extends AbstractController<UserType, User> {
   async delete(userData: UserType): Promise<User | User[]> {
     if (userData.id) {
       if (!(await this.getById(userData.id))) {
-        throw Error(`Users/deleteUser - no user exists`);
+        throw Error(`Users/deleteUser - user does not exist`);
       }
 
       try {
