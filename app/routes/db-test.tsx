@@ -12,7 +12,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   switch (op) {
     case 'create':
       // create user
-      user = new User('test@example.com', 'guest', 'testid', { theme: 'light' });
+      user = { id: 'testid', username: 'test@example.com', role: 'guest', preferences: { theme: 'dark' } };
       return json(await users.create(user));
       break;
     case 'read':
@@ -22,14 +22,13 @@ export const loader: LoaderFunction = async ({ request }) => {
       break;
     case 'update':
       // update user
-      user = new User('test@example.com', 'admin', 'testid', { theme: 'light' });
+      user = { id: 'testid', role: 'admin', preferences: { theme: 'light' } };
       return json(await users.update(user));
       // return null;
       break;
     case 'delete':
       // delete user
-      user = new User('test@example.com');
-      user.setId('testid');
+      user = { id: 'testid' };
       return json(await users.delete(user));
       break;
     default:
