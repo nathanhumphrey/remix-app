@@ -101,15 +101,15 @@ export interface DBInterface {
 /**
  * Abstract class for all controllers to extend
  */
-export abstract class AbstractController<Model> {
+export abstract class AbstractController<ModelData, Model> {
   /**
    * Instantiates a new controller.
    * @param {string} collection the name used to represent the collection of models in the database
    * @param {DBInterface} db the database reference
    */
   constructor(protected collection: string, protected db: DBInterface) {}
-  abstract create(model: Model): Promise<Model>;
+  abstract create(modelData: ModelData): Promise<Model>;
   abstract read(options?: QueryOptions): Promise<Model[]>;
-  abstract update(user: Model): Promise<Model | Model[]>;
-  abstract delete(user: Model): Promise<Model | Model[]>;
+  abstract update(modelData: ModelData): Promise<Model | Model[]>;
+  abstract delete(modelData: ModelData): Promise<Model | Model[]>;
 }

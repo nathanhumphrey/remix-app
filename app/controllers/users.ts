@@ -12,7 +12,7 @@ type UserType = {
 /**
  * Controller class for working with User model objects.
  */
-export class Users extends AbstractController<User> {
+export class Users extends AbstractController<UserType, User> {
   /**
    * Creates a new Users controller with 'users' collection param
    * @see AbstractController.constructor()
@@ -24,33 +24,24 @@ export class Users extends AbstractController<User> {
 
   /**
    * Creates a new user in the database; requires a username
-   * @param {User} user the user model to create in the databas
+   * @param {UserType} userData the user model to create in the databas
    * @returns {User} the user model with any updated default|derived field values
    * @throws Will throw an error if username is empty, user already exists, or database call fails
    */
-  async create(user: User): Promise<User> {
-    if (user.getUsername()) {
-      if (await this.getByUsername(user.getUsername())) {
+  async create(userData: UserType): Promise<User> {
+    if (userData.username) {
+      if (await this.getByUsername(userData.username)) {
         throw Error(`Users/createUser - user already exists`);
       }
       // Default to role guest
-      if (!user.getRole()) {
-        user.setRole('guest');
+      if (!userData.role) {
+        userData.role = 'guest';
       }
       try {
-        const result: DBResult = await this.db.executeInsert(
-          {
-            username: user.getUsername(),
-            id: user.getId(),
-            role: user.getRole(),
-            preferences: user.getPreferences(),
-          },
-          { collection: this.collection }
-        );
-        if (result.count() === 1) {
-          const u = result.rows().pop() as UserType;
-          return new User(u.username, u?.role, u?.id, u.preferences);
-        } // TODO: what if the count is NOT 1? ... it shouldn't be, but ...
+        const result: DBResult = await this.db.executeInsert(userData, { collection: this.collection });
+        const u = result.rows().pop() as UserType;
+
+        return new User(u.username, u?.role, u?.id, u?.preferences);
       } catch (error) {
         throw Error(`Users/createUser - ${error}`);
       }
@@ -74,36 +65,28 @@ export class Users extends AbstractController<User> {
 
   /**
    * Updates a user in the database; requires an id
-   * @param {User} user the user model to update in the database
-   * @returns {User | User[]} the user(s) that have been updated
+   * @param {UserType} userData the user model to update in the database
+   * @returns {User} the user that has been updated
    * @throws Will throw an error if id is empty, user does not exist, or database call fails
    */
-  async update(user: User): Promise<User | User[]> {
-    if (user.getId()) {
-      if (!(await this.getById(user.getId()))) {
+  async update(userData: UserType): Promise<User | User[]> {
+    if (userData.id) {
+      if (!(await this.getById(userData.id))) {
         throw Error(`Users/updateUser - no user exists`);
       }
 
       try {
-        const result: DBResult = await this.db.executeUpdate(
-          {
-            username: user.getUsername(),
-            id: user.getId(),
-            role: user.getRole(),
-            preferences: user.getPreferences(),
-          },
-          { collection: this.collection, where: { field: 'id', operator: '==', value: user.getId() } }
-        );
+        const result: DBResult = await this.db.executeUpdate(userData, {
+          collection: this.collection,
+          where: { field: 'id', operator: '==', value: userData.id },
+        });
 
-        const users = result.rows().map((record) => {
+        const user = ((record) => {
           const u = record as UserType;
           return new User(u.username as string, u.role, u.id, u.preferences);
-        });
-        if (result.count() === 1) {
-          return users.pop() as User;
-        } else {
-          return users;
-        }
+        })(result.rows().pop());
+
+        return user;
       } catch (error) {
         throw Error(`Users/updateUser - ${error}`);
       }
@@ -114,32 +97,30 @@ export class Users extends AbstractController<User> {
 
   /**
    * Delete a user in the database; requires an id
-   * @param {User} user the user model to delete in the database
+   * @param {UserType} userData the user model to delete in the database
    * @returns {User | User[]} the user(s) that have been deleted
    * @throws Will throw an error if id is empty, user does not exist, or database call fails
    */
-  async delete(user: User): Promise<User | User[]> {
-    if (user.getId()) {
-      if (!(await this.getById(user.getId()))) {
+  async delete(userData: UserType): Promise<User | User[]> {
+    if (userData.id) {
+      if (!(await this.getById(userData.id))) {
         throw Error(`Users/deleteUser - no user exists`);
       }
 
       try {
         const result: DBResult = await this.db.executeDelete(
           {
-            id: user.getId(),
+            id: userData.id,
           },
-          { collection: this.collection, where: { field: 'id', operator: '==', value: user.getId() } }
+          { collection: this.collection, where: { field: 'id', operator: '==', value: userData.id } }
         );
-        const users = result.rows().map((record) => {
+
+        const user = ((record) => {
           const u = record as UserType;
           return new User(u.username as string, u.role, u.id, u.preferences);
-        });
-        if (result.count() === 1) {
-          return users.pop() as User;
-        } else {
-          return users;
-        }
+        })(result.rows().pop());
+
+        return user;
       } catch (error) {
         throw Error(`Users/deleteUser - ${error}`);
       }
