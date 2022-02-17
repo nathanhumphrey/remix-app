@@ -121,7 +121,7 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
     }
   }
 
-  logout(request: Request, redirectTo: string): any {
+  logout(request: Request, redirectTo = '/'): Promise<Response> {
     return this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo);
   }
 

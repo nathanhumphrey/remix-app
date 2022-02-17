@@ -84,7 +84,6 @@ export class FileAuth implements AuthInterface<AuthUserType> {
   }
 
   async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
-    // update to also check role claim if required
     const user = await this.user(request);
     if (user === null || (role && role !== user?.role)) {
       if (redirectTo) {

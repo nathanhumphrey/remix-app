@@ -12,7 +12,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   // page requires admin user role for access
   await auth.requireUser(request, 'admin', '/');
 
-  // get the current auth user
+  // get the current auth user for the page
   return await auth.user(request);
 };
 

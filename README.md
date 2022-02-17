@@ -22,7 +22,7 @@ _One general note, the implementations included with this project separate the a
 The directory structure has been arranged in the following way:
 
 ```sh
-app/
+/app/
 |-- auth.server/    # contains auth interfaces and implementation
 |-- components/     # contains page components (empty)
 |-- controllers/    # contains use case controllers and db interfaces
@@ -34,6 +34,7 @@ app/
 |-- util/           # general application utilities
 |   |-- session/    # session interfaces and implementation
 |-- firebase.ts     # firebase initialization file
+/__tests__/         # directory for jest tests
 ```
 
 ## Interfaces and Implementations (current)
@@ -162,6 +163,10 @@ Exports a file-base session implementation.
 #### [`index.ts`](app/util/session/index.ts)
 
 This file imports the desired implementation (e.g. cookie, file, etc.) and exports the default Remix cookie functions (`{ getSession, commitSession, destroySession }`) for use in the application.
+
+### /\_\_tests\_\_/
+
+The project makes use of [Jest](https://jestjs.io) for testing. Arrange your tests however you like.
 
 ## Firebase Integration
 
