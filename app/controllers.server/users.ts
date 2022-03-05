@@ -24,7 +24,7 @@ export class Users extends AbstractController<UserType, User> {
 
   /**
    * Creates a new user in the database; requires a username
-   * @param {UserType} userData the user model to create in the databas
+   * @param {UserType} userData the user model to create in the database
    * @returns {User} the user model with any updated default|derived field values
    * @throws Will throw an error if username is empty, user already exists, or database call fails
    */

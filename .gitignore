@@ -11,5 +11,6 @@ api/_build
 *.log
 env.sh
 *firebase-adminsdk*
+tester.tsx
 app/sessions/*
 __tests__/models/

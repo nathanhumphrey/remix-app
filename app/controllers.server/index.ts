@@ -1,5 +1,5 @@
 import { Users } from './users';
-import { db } from '~/db';
+import { db } from '~/db.server';
 import { DBResult } from './controller-types';
 import type { Condition, DBInterface, LimitOptions, OrderByOptions, QueryOptions } from './controller-types';
 

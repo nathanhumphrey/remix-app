@@ -23,18 +23,18 @@ The directory structure has been arranged in the following way:
 
 ```sh
 /app/
-|-- auth.server/    # contains auth interfaces and implementation
-|-- components/     # contains page components (empty)
-|-- controllers/    # contains use case controllers and db interfaces
-|-- db/             # contains db implementation
-|-- models/         # contains business entities
-|-- routes/         # remix routes directory
-|-- sessions/       # location for writing file-based sessions (empty)
-|-- styles/         # css styling
-|-- util/           # general application utilities
-|   |-- session/    # session interfaces and implementation
-|-- firebase.ts     # firebase initialization file
-/__tests__/         # directory for jest tests
+|-- auth.server/        # contains auth interfaces and implementation
+|-- components/         # contains page components (empty)
+|-- controllers.server/ # contains use case controllers and db interfaces
+|-- db.server/          # contains db implementation
+|-- models/             # contains business entities
+|-- routes/             # remix routes directory
+|-- sessions/           # location for writing file-based sessions (empty)
+|-- styles/             # css styling
+|-- util/               # general application utilities
+|   |-- session/        # session interfaces and implementation
+|-- firebase.ts         # firebase initialization file
+/__tests__/             # directory for jest tests
 ```
 
 ## Interfaces and Implementations (current)
@@ -72,7 +72,7 @@ This file exports a `FirebaseAuth: AuthInterface`. The Firebase implementation u
 
 This file exports `auth: AuthInterface` for use in the application.
 
-### /app/controllers/
+### /app/controllers.server/
 
 The controller implementation is left to the developer. There are many different methodologies that can impact the development of controllers, and this project doesn't seek to limit them. The pattern that is followed in this starter package is to define the DBInterface for controllers in this directory. The reasoning behind this decision is to allow for development of the use case controllers to happen without accounting for the database implementation -- in other words, the database shouldn't impact how the controllers are developed. Implement the classes and interfaces that work best for your setup. This directory contains the following files:
 
@@ -88,7 +88,7 @@ This file exports `Users: AbstractController<User>`, which is an example impleme
 
 This file exports `DBResult`, `Condition`, `DBInterface`, `LimitOptions`, `OrderByOptions`, and `QueryOptions` and any controller implementations (e.g. `users: Users` in the starter) for use in the application.
 
-### /app/db/
+### /app/db.server/
 
 Database implementation resides in this directory. In keeping with the explanation above regarding controllers, any exported database implementation should implement the database interface exported from `/app/controllers`. In this way, you could develop several implementations (e.g. PostgreSQL, MySQL, Firestore, etc.) and the higher application wouldn't have to be updated to accommodate (lofty goals, I know). This directory contains the following files:
 

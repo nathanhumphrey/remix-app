@@ -3,6 +3,7 @@ import { json, Form, useActionData, redirect } from 'remix';
 import { auth } from '~/auth.server';
 import type { ActionFunction, LoaderFunction } from 'remix';
 import type { AppError } from '~/util';
+import { users } from '~/controllers.server';
 
 export let meta = () => {
   return {
@@ -45,7 +46,9 @@ export const action: ActionFunction = async ({ request }) => {
     // TODO: CSRF check
 
     // Create the account and redirect to the home/login page
-    return auth.createAccount({ username: email, password }, '/');
+    const res = await (await auth.createAccount({ username: email, password })).json();
+    await users.create({ id: res.user.uid, role: 'guest', username: res.user.email, preferences: { theme: 'dark' } });
+    return redirect('/');
   } catch (error) {
     console.error('signup/general', `Could not create the account - ${error}`);
     return json<AppError>(

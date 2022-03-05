@@ -12,12 +12,12 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
 
   async createAccount(user: AuthUserType, redirectTo?: string): Promise<Response> {
     try {
-      await auth.createUser({ email: user.username, password: user.password });
+      const newUser = await auth.createUser({ email: user.username, password: user.password });
       if (redirectTo) {
         return redirect(redirectTo);
       } else {
         return json(
-          { status: 'success' },
+          { status: 'success', user: newUser },
           {
             status: 201,
           }

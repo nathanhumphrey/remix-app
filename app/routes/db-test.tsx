@@ -1,5 +1,5 @@
 import { json } from 'remix';
-import { users } from '~/controllers';
+import { users } from '~/controllers.server';
 import type { LoaderFunction } from 'remix';
 
 export const loader: LoaderFunction = async ({ request }) => {

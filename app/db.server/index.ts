@@ -1,4 +1,4 @@
-import type { DBInterface } from '~/controllers';
+import type { DBInterface } from '~/controllers.server';
 import { firestoreDb } from './firestore-db';
 
 /**
