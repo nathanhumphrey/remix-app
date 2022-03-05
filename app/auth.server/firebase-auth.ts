@@ -1,20 +1,8 @@
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { json, redirect } from 'remix';
-import { auth } from '~/firebase';
+import { auth, restApiUrl } from '~/firebase';
 import { AppError } from '~/util';
 import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types';
-
-/**
- * Required API key for use in REST API to sign in user
- */
-const API_KEY: string | undefined = process.env.FIREBASE_WEB_API_KEY;
-let URL = '';
-
-if (process.env.NODE_ENV === 'development') {
-  URL = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=123`;
-} else {
-  URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
-}
 
 /**
  * Firebase implementation of AuthInterface
@@ -54,7 +42,7 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
       const headers: Headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
-      const req: Request = new Request(URL, {
+      const req: Request = new Request(restApiUrl, {
         method: 'post',
         headers,
         body: JSON.stringify({

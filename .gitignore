@@ -12,3 +12,4 @@ api/_build
 env.sh
 *firebase-adminsdk*
 app/sessions/*
+__tests__/models/
