@@ -1,7 +1,7 @@
 import { Users } from './users';
 import { db } from '~/db.server';
 import { DBResult } from './controller-types';
-import type { Condition, DBInterface, LimitOptions, OrderByOptions, QueryOptions } from './controller-types';
+import type { Condition, DB, LimitOptions, OrderByOptions, QueryOptions } from './controller-types';
 
 /**
  * Initialized users controller
@@ -9,4 +9,4 @@ import type { Condition, DBInterface, LimitOptions, OrderByOptions, QueryOptions
 const users: Users = new Users(db);
 
 export { DBResult, users };
-export type { Condition, DBInterface, LimitOptions, OrderByOptions, QueryOptions };
+export type { Condition, DB, LimitOptions, OrderByOptions, QueryOptions };

@@ -1,16 +1,29 @@
 import { DecodedIdToken } from 'firebase-admin/auth';
 import { json, redirect } from 'remix';
-import { auth, restApiUrl } from '~/firebase';
+import { auth, restApiSignInUrl } from '~/firebase';
 import { AppError } from '~/util';
-import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types';
+import type { Auth, AuthSession, AuthUser } from './auth-types';
 
 /**
- * Firebase implementation of AuthInterface
+ * Firebase implementation of Auth Interface
  */
-export class FirebaseAuth implements AuthInterface<AuthUserType> {
-  constructor(private session: AuthSessionType) {}
+export class FirebaseAuth implements Auth<AuthUser> {
+  constructor(private session: AuthSession) {}
 
-  async createAccount(user: AuthUserType, redirectTo?: string): Promise<Response> {
+  async createAccount(user: AuthUser, redirectTo?: string): Promise<Response> {
+    if (!user?.username || !user?.password) {
+      return json<AppError>(
+        {
+          status: 'error',
+          errorCode: 'auth/createAccount',
+          errorMessage: `Could not create the account - missing params`,
+        },
+        {
+          status: 422,
+        }
+      );
+    }
+
     try {
       const newUser = await auth.createUser({ email: user.username, password: user.password });
       if (redirectTo) {
@@ -31,18 +44,31 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
           errorMessage: `Could not create the account - ${error}`,
         },
         {
-          status: 500, //422
+          status: 500,
         }
       );
     }
   }
 
-  async login(user: AuthUserType): Promise<any> {
+  async login(user: AuthUser): Promise<Response> {
+    if (!user?.username || !user?.password) {
+      return json<AppError>(
+        {
+          status: 'error',
+          errorCode: 'auth/login',
+          errorMessage: `Could not login - missing params`,
+        },
+        {
+          status: 422,
+        }
+      );
+    }
+
     try {
       const headers: Headers = new Headers();
       headers.append('Content-Type', 'application/json');
 
-      const req: Request = new Request(restApiUrl, {
+      const req: Request = new Request(restApiSignInUrl, {
         method: 'post',
         headers,
         body: JSON.stringify({
@@ -52,10 +78,10 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
         }),
       });
       const authResponse: Response = await fetch(req);
-      const creds: any = await authResponse.json();
+      const credentials: any = await authResponse.json();
 
       // check for error
-      if (creds.error) {
+      if (credentials.error) {
         return json(
           {
             status: 'error',
@@ -69,20 +95,20 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
       }
 
       // get the user to retrieve any custom claims (e.g. role)
-      const firebaseUser = await auth.getUser(creds.localId);
+      const firebaseUser = await auth.getUser(credentials.localId);
+
       // expires in 5 days
       const expiresIn: number = 60 * 60 * 24 * 5 * 1000;
+
       // Create the session cookie. This will also verify the ID token in the process.
       // The session cookie will have the same claims as the ID token.
       // To only allow session cookie setting on recent sign-in, auth_time in ID token
       // can be checked to ensure user was recently signed in before creating a session cookie.
-
-      const sessionIdToken: string = await auth.createSessionCookie(creds.idToken, {
+      const sessionIdToken: string = await auth.createSessionCookie(credentials.idToken, {
         expiresIn,
       });
 
-      // now create the session
-      const sessionUser: AuthUserType = {
+      const sessionUser: AuthUser = {
         id: firebaseUser.uid,
         username: firebaseUser.email,
         name: firebaseUser.displayName,
@@ -103,7 +129,7 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
           errorMessage: `There was a problem logging in`,
         },
         {
-          status: 500, //422
+          status: 500,
         }
       );
     }
@@ -113,7 +139,7 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
     return this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo);
   }
 
-  async exists(user: AuthUserType): Promise<boolean> {
+  async exists(user: AuthUser): Promise<boolean> {
     try {
       if (await auth.getUserByEmail(user.username)) {
         return true;
@@ -132,24 +158,16 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
     return false;
   }
 
-  /**
-   *
-   * @param request
-   * @param role {string | null} user role required to access the resource
-   * @param redirectTo {string} where to redirect the user if the requirement fails
-   * @returns
-   */
   async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
     const session = await this.session.getAuthSession(request);
-    const idToken = session.get('idToken');
+    const sessionIdToken = session.get('idToken');
     let decodedClaims: DecodedIdToken;
 
-    if (idToken && typeof idToken === 'string') {
-      // Attempt to verify the Firebase session
+    if (sessionIdToken && typeof sessionIdToken === 'string') {
       try {
-        decodedClaims = await auth.verifySessionCookie(idToken);
+        decodedClaims = await auth.verifySessionCookie(sessionIdToken);
       } catch (error) {
-        // Failed verification (e.g. Firebase session cookie revoked), unset session vars
+        // Failed verification (e.g. Firebase session cookie revoked) -> unset session vars
         throw await this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo ? redirectTo : undefined);
       }
 
@@ -163,7 +181,6 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
       }
     }
 
-    // Failed to verify access
     if (redirectTo) {
       throw redirect(redirectTo);
     } else {
@@ -180,9 +197,9 @@ export class FirebaseAuth implements AuthInterface<AuthUserType> {
     }
   }
 
-  async user(request: Request): Promise<AuthUserType | null> {
+  async user(request: Request): Promise<AuthUser | null> {
     const session = await this.session.getAuthSession(request);
-    const user: AuthUserType = JSON.parse(session.get('user') || null);
+    const user: AuthUser = JSON.parse(session.get('user') || null);
     return user;
   }
 }

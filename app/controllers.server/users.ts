@@ -1,5 +1,5 @@
 import { User } from '~/models';
-import { AbstractController, DBInterface, QueryOptions } from './controller-types';
+import { Controller, DB, QueryOptions } from './controller-types';
 import type { DBResult } from './controller-types';
 
 type UserType = {
@@ -10,15 +10,15 @@ type UserType = {
 };
 
 /**
- * Controller class for working with User model objects.
+ * Controller class for working with User model objects
  */
-export class Users extends AbstractController<UserType, User> {
+export class Users extends Controller<UserType, User> {
   /**
    * Creates a new Users controller with 'users' collection param
    * @see AbstractController.constructor()
-   * @param {DBInterface} db the database reference
+   * @param {DB} db the database reference
    */
-  constructor(db: DBInterface) {
+  constructor(db: DB) {
     super('users', db);
   }
 
@@ -33,10 +33,11 @@ export class Users extends AbstractController<UserType, User> {
       if (await this.getByUsername(userData.username)) {
         throw Error(`Users/createUser - user already exists`);
       }
-      // Default to role guest
+
       if (!userData.role) {
         userData.role = 'guest';
       }
+
       try {
         const result: DBResult = await this.db.executeInsert(userData, { collection: this.collection });
         const u = result.rows().pop() as UserType;
@@ -45,18 +46,19 @@ export class Users extends AbstractController<UserType, User> {
       } catch (error) {
         throw Error(`Users/createUser - ${error}`);
       }
+    } else {
+      throw Error(`Users/createUser - could not create user, missing required field`);
     }
-    throw Error(`Users/createUser - could not create user, missing required field`);
   }
 
   /**
-   * Provides a way to submit a custom users query to the database.
+   * Provides a way to submit a custom users query to the database
    * @param {QueryOptions} options query options
    * @returns {User[]} an array of matched users
    */
   async read(options?: QueryOptions): Promise<User[]> {
     const records = await this.db.executeQuery({ ...options, collection: this.collection });
-    // Convert the records into the requried User type
+
     return records.rows().map((record) => {
       const u = record as UserType;
       return new User(u.username, u.role, u.id, u.preferences);
@@ -130,7 +132,7 @@ export class Users extends AbstractController<UserType, User> {
   }
 
   /**
-   * Get a user by the id.
+   * Get a user by the id
    * @param {string} id the id of the user to retrieve
    * @returns {User | null} the user retrieved from the database or null if no match was found
    */
@@ -149,7 +151,7 @@ export class Users extends AbstractController<UserType, User> {
   }
 
   /**
-   * Get a user by the username.
+   * Get a user by the username
    * @param {string} username the username of the user to retrieve
    * @returns {User | null} the user retrieved from the database or null if no match was found
    */
@@ -170,7 +172,7 @@ export class Users extends AbstractController<UserType, User> {
   /**
    * Facade method for all({ role })
    * @param role the role to filter by
-   * @returns
+   * @returns {User[]} an array of matched users
    */
   allByRole(role: string) {
     return this.read({ collection: this.collection, where: { field: 'role', operator: '==', value: role } });

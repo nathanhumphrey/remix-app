@@ -65,7 +65,7 @@ export type QueryOptions = {
 /**
  * Required interface for database support in the application.
  */
-export interface DBInterface {
+export interface DB {
   /**
    * Queries the database.
    * @param {QueryOptions} options optional modifiers for the query
@@ -101,13 +101,13 @@ export interface DBInterface {
 /**
  * Abstract class for all controllers to extend
  */
-export abstract class AbstractController<ModelData, Model> {
+export abstract class Controller<ModelData, Model> {
   /**
    * Instantiates a new controller.
    * @param {string} collection the name used to represent the collection of models in the database
-   * @param {DBInterface} db the database reference
+   * @param {DB} db the database reference
    */
-  constructor(protected collection: string, protected db: DBInterface) {}
+  constructor(protected collection: string, protected db: DB) {}
   abstract create(modelData: ModelData): Promise<Model>;
   abstract read(options?: QueryOptions): Promise<Model[]>;
   abstract update(modelData: ModelData): Promise<Model | Model[]>;

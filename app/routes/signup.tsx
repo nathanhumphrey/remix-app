@@ -45,9 +45,11 @@ export const action: ActionFunction = async ({ request }) => {
 
     // TODO: CSRF check
 
-    // Create the account and redirect to the home/login page
+    // Create the account
     const res = await (await auth.createAccount({ username: email, password })).json();
+    // Create the user in the database
     await users.create({ id: res.user.uid, role: 'guest', username: res.user.email, preferences: { theme: 'dark' } });
+    // Redirect to the home/login page
     return redirect('/');
   } catch (error) {
     console.error('signup/general', `Could not create the account - ${error}`);

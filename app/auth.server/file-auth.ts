@@ -2,12 +2,9 @@ import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
 import { json, redirect } from 'remix';
 import { AppError } from '~/util';
-import type { AuthInterface, AuthSessionType, AuthUserType } from './auth-types';
+import type { Auth, AuthSession, AuthUser } from './auth-types';
 
 // location of users.json file relative to build path NOT app
-/**
- * Location of local users.json file
- */
 const usersFile = path.join(__dirname, '../../app/auth.server/users.json');
 
 /**
@@ -16,16 +13,16 @@ const usersFile = path.join(__dirname, '../../app/auth.server/users.json');
  * NO AUTH SESSION VERIFICATION, ETC.).
  * FOR TESTING PURPOSES ONLY.
  */
-export class FileAuth implements AuthInterface<AuthUserType> {
-  private users: AuthUserType[];
+export class FileAuth implements Auth<AuthUser> {
+  private users: AuthUser[];
 
-  constructor(private session: AuthSessionType) {
+  constructor(private session: AuthSession) {
     let rawdata = readFileSync(usersFile);
     let users = JSON.parse(rawdata.toString());
     this.users = users;
   }
 
-  async createAccount(user: AuthUserType, redirectTo: string): Promise<Response> {
+  async createAccount(user: AuthUser, redirectTo: string): Promise<Response> {
     if (!this.exists(user)) {
       user.id = UUID.generate();
       this.users.push(user);
@@ -54,9 +51,9 @@ export class FileAuth implements AuthInterface<AuthUserType> {
     }
   }
 
-  async login(user: AuthUserType): Promise<Response> {
+  async login(user: AuthUser): Promise<Response> {
     if (this.exists(user)) {
-      let match: AuthUserType | undefined = this.users.find((u) => user.username === u.username);
+      let match: AuthUser | undefined = this.users.find((u) => user.username === u.username);
 
       if (match && match.password === user.password) {
         // stuff any required info into the user session
@@ -75,7 +72,7 @@ export class FileAuth implements AuthInterface<AuthUserType> {
     );
   }
 
-  exists(user: AuthUserType): boolean {
+  exists(user: AuthUser): boolean {
     const check = this.users.filter((u) => u.username === user.username);
     if (check.length === 1) {
       return true;
@@ -114,7 +111,7 @@ export class FileAuth implements AuthInterface<AuthUserType> {
     return this.session.destroyAuthSession(request, ['id'], redirectTo);
   }
 
-  async user(request: Request): Promise<AuthUserType | null> {
+  async user(request: Request): Promise<AuthUser | null> {
     const session = await this.session.getAuthSession(request);
     const id = session.get('id');
     // let user: AuthUserType;

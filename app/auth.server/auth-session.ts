@@ -1,12 +1,9 @@
 import { json, redirect } from 'remix';
 import { getSession, commitSession } from '~/util/session';
 import type { Session } from 'remix';
-import type { AuthSessionType } from './auth-types';
+import type { AuthSession } from './auth-types';
 
-/**
- * Implementation of AuthSessionType
- */
-export const authSession: AuthSessionType = {
+export const authSession: AuthSession = {
   getAuthSession(request: Request): Promise<Session> {
     return getSession(request.headers.get('Cookie'));
   },

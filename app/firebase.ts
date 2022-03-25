@@ -4,12 +4,12 @@ import { getFirestore, Firestore } from 'firebase-admin/firestore';
 
 let app: App;
 let auth: Auth;
-let restApiUrl = '';
+let restApiSignInUrl = '';
 let db: Firestore;
 
 if (process.env.NODE_ENV === 'development') {
   app = getApps().length === 0 ? initializeApp({ projectId: 'demo-remix-app' }) : getApp();
-  restApiUrl = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=123`;
+  restApiSignInUrl = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=123`;
 } else {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY === undefined) {
     throw Error('Missing FIREBASE_SERVICE_ACCOUNT_KEY');
@@ -21,10 +21,10 @@ if (process.env.NODE_ENV === 'development') {
 
   const serviceAccount: ServiceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
   app = getApps().length === 0 ? initializeApp({ credential: cert(serviceAccount) }) : getApp();
-  restApiUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`;
+  restApiSignInUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`;
 }
 
 auth = getAuth(app);
 db = getFirestore(app);
 
-export { app, auth, db, restApiUrl };
+export { app, auth, db, restApiSignInUrl };

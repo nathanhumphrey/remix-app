@@ -1,9 +1,9 @@
 import { Session } from 'remix';
 
 /**
- * Base session manager for authentication requests.
+ * Base session manager type for authentication requests.
  */
-export type AuthSessionType = {
+export type AuthSession = {
   /**
    * Returns the current user session object
    * @param {Request} request the resource request
@@ -31,7 +31,7 @@ export type AuthSessionType = {
  * Base user type for use with AuthInterface implementers.
  * May be extended to support additional properties.
  */
-export type AuthUserType = {
+export type AuthUser = {
   /**
    * Unique identifier for a user
    */
@@ -59,7 +59,7 @@ export type AuthUserType = {
  * to determine what types to return, typically a Promise<Response> is
  * appropriate.
  */
-export interface AuthInterface<User extends AuthUserType> {
+export interface Auth<User extends AuthUser> {
   /**
    * Creates a new user account
    * @param {User} user the user account details
