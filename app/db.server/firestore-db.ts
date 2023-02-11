@@ -1,6 +1,6 @@
 import { db } from '~/firebase';
 import { DBResult } from '~/controllers.server';
-import type { Firestore, OrderByDirection, Query, WhereFilterOp } from 'firebase-admin/firestore';
+import type { DocumentData, Firestore, OrderByDirection, Query, WhereFilterOp } from 'firebase-admin/firestore';
 import type { DB, QueryOptions, OrderByOptions } from '~/controllers.server';
 
 export class FirestoreDB implements DB {
@@ -27,7 +27,9 @@ export class FirestoreDB implements DB {
         }
       }
 
-      const models: object[] = (await query.get()).docs.map((doc) => doc.data());
+      const models: object[] = (await query.get()).docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
 
       return new DBResult(models);
     } catch (error) {
@@ -37,10 +39,17 @@ export class FirestoreDB implements DB {
     return new DBResult([]);
   }
 
-  async executeInsert(model: object, options: QueryOptions): Promise<DBResult> {
+  async executeInsert(model: any, options: QueryOptions): Promise<DBResult> {
     try {
       const collectionRef = db.collection(options.collection);
-      const inserted = await (await (await collectionRef.add(model)).get()).data();
+      let inserted: DocumentData | undefined;
+
+      if (Object.getOwnPropertyDescriptor(model, 'id')) {
+        inserted = await collectionRef.doc(model['id']).set(model);
+      } else {
+        inserted = (await (await collectionRef.add(model)).get()).data();
+      }
+
       if (inserted) {
         return new DBResult([inserted]);
       } else {
@@ -53,7 +62,7 @@ export class FirestoreDB implements DB {
     return new DBResult([]);
   }
 
-  async executeUpdate(model: object, options: QueryOptions): Promise<DBResult> {
+  async executeUpdate(model: any, options: QueryOptions): Promise<DBResult> {
     try {
       const collectionRef = db.collection(options.collection);
       const query = collectionRef.where(
@@ -80,7 +89,7 @@ export class FirestoreDB implements DB {
     return new DBResult([]);
   }
 
-  async executeDelete(model: object, options: QueryOptions): Promise<DBResult> {
+  async executeDelete(model: any, options: QueryOptions): Promise<DBResult> {
     try {
       const collectionRef = db.collection(options.collection);
       const query = collectionRef.where(
