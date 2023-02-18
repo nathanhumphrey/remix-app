@@ -1,7 +1,7 @@
-import { DecodedIdToken } from 'firebase-admin/auth';
-import { json, redirect } from 'remix';
+import type { DecodedIdToken } from 'firebase-admin/auth';
+import { json, redirect } from '@remix-run/node';
 import { auth, restApiSignInUrl } from '~/firebase';
-import { AppError } from '~/util';
+import type { AppError } from '~/util';
 import type { Auth, AuthSession, AuthUser } from './auth-types';
 
 /**

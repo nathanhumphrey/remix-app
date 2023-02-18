@@ -1,5 +1,5 @@
-import { Form, Outlet, useLoaderData } from 'remix';
-import type { LoaderFunction } from 'remix';
+import { Form, Outlet, useLoaderData } from '@remix-run/react';
+import type { LoaderFunction } from '@remix-run/node';
 import { auth } from '~/auth.server';
 
 export let meta = () => {

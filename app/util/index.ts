@@ -1,2 +1,2 @@
-import { AppError } from './error-types';
-export { AppError };
+import type { AppError } from './error-types';
+export type { AppError };

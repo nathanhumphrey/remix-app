@@ -1,4 +1,4 @@
-import { Session } from 'remix';
+import type { Session } from '@remix-run/node';
 
 /**
  * Base session manager type for authentication requests.

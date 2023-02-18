@@ -1,5 +1,5 @@
 import path from 'path';
-import { createFileSessionStorage } from 'remix';
+import { createFileSessionStorage } from '@remix-run/node';
 
 const sessionSecret = process.env.SESSION_SECRET;
 if (!sessionSecret) {

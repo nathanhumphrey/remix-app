@@ -1,7 +1,8 @@
 import { useRef } from 'react';
-import { json, Form, useActionData, useLoaderData, Link } from 'remix';
+import { Form, useActionData, useLoaderData, Link } from '@remix-run/react';
+import { json } from '@remix-run/node';
 import { auth } from '~/auth.server';
-import type { ActionFunction, LoaderFunction } from 'remix';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import type { AppError } from '~/util';
 
 export let meta = () => {

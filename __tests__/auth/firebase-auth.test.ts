@@ -1,6 +1,6 @@
 import { installGlobals } from '@remix-run/node';
-import { FirebaseAuth } from '~/auth.server/firebase-auth';
-import type { AuthSession } from '~/auth.server/auth-types';
+import { FirebaseAuth } from '../../app/auth.server/firebase-auth';
+import type { AuthSession } from '../../app/auth.server/auth-types';
 
 const testUserCredentials = {
   username: 'test@example.com',
@@ -33,6 +33,11 @@ let auth: FirebaseAuth;
 beforeAll(() => {
   auth = new FirebaseAuth(sessionMock);
   return Promise.all([clearEmulatorAccounts(), createEmulatorAccount()]);
+});
+
+afterAll(async () => {
+  auth = new FirebaseAuth(sessionMock);
+  return await clearEmulatorAccounts();
 });
 
 describe('FirebaseAuth', () => {

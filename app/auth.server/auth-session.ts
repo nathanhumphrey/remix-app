@@ -1,6 +1,6 @@
-import { json, redirect } from 'remix';
+import { json, redirect } from '@remix-run/node';
 import { getSession, commitSession } from '~/util/session';
-import type { Session } from 'remix';
+import type { Session } from '@remix-run/node';
 import type { AuthSession } from './auth-types';
 
 export const authSession: AuthSession = {

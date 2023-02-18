@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import path from 'path';
-import { json, redirect } from 'remix';
-import { AppError } from '~/util';
+import { json, redirect } from '@remix-run/node';
+import type { AppError } from '~/util';
 import type { Auth, AuthSession, AuthUser } from './auth-types';
 
 // location of users.json file relative to build path NOT app

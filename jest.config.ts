@@ -1,21 +1,21 @@
 import type { Config } from '@jest/types';
-// Sync object
+
 const config: Config.InitialOptions = {
-  verbose: true,
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-  },
-  roots: ['__tests__'],
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json',
-      diagnostics: true,
-    },
-  },
-  //https://github.com/firebase/firebase-admin-node/issues/1465#issuecomment-949053266
-  resolver: 'jest-node-exports-resolver',
   moduleNameMapper: {
     '~/(.*)': '<rootDir>/app/$1',
   },
+  preset: 'ts-jest/presets/default-esm', // or other ESM presets
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
+  },
+  roots: ['__tests__'],
+  testEnvironment: 'node',
+  moduleFileExtensions: ['ts', 'js', 'json'],
+  watchPathIgnorePatterns: ['<rootDir>/node_modules/'],
+  testRegex: '.*\\.test\\.tsx?$',
+  coverageDirectory: './coverage/',
+  collectCoverage: true,
 };
 export default config;

@@ -1,7 +1,8 @@
 import { useRef } from 'react';
-import { json, Form, useActionData, redirect } from 'remix';
+import { Form, useActionData } from '@remix-run/react';
+import { json, redirect } from '@remix-run/node';
 import { auth } from '~/auth.server';
-import type { ActionFunction, LoaderFunction } from 'remix';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import type { AppError } from '~/util';
 import { users } from '~/controllers.server';
 
