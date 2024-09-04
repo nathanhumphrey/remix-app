@@ -1,16 +1,74 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
   "emulators": {
+    "hub": {
+      "host": "0.0.0.0",
+      "port": 4400
+    },
+    "logging": {
+      "host": "0.0.0.0",
+      "port": 4500
+    },
+    "eventarc": {
+      "host": "0.0.0.0",
+      "port": 9299
+    },
+    "database": {
+      "host": "0.0.0.0",
+      "port": 9000
+    },
+    "firestore": {
+      "host": "0.0.0.0",
+      "port": 8080
+    },
+    "functions": {
+      "host": "0.0.0.0",
+      "port": 5001
+    },
+    "hosting": {
+      "host": "0.0.0.0",
+      "port": 6000
+    },
     "auth": {
+      "host": "0.0.0.0",
       "port": 9099
     },
     "ui": {
-      "enabled": true
-    },
-    "firestore": {
-      "port": 8080
+      "enabled": true,
+      "host": "0.0.0.0",
+      "port": 4000
     }
+  },
+  "hosting": {
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   }
 }

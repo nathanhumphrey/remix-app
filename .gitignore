@@ -14,3 +14,6 @@ env.sh
 tester.tsx
 app/sessions/*
 __tests__/models/
+
+# misc
+.DS_Store

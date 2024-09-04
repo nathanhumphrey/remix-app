@@ -18,6 +18,7 @@
     "@vercel/node": "^2.0.0",
     "firebase": "^9.9.0",
     "firebase-admin": "^11.0.0",
+    "firebase-functions": "^5.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },

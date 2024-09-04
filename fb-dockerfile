@@ -1,0 +1,18 @@
+FROM node:20.17-alpine
+
+ENV FIREBASE_TOOLS_VERSION=13.16.0
+RUN yarn global add firebase-tools@${FIREBASE_TOOLS_VERSION} && \
+  yarn cache clean && \
+  firebase -V && \
+  mkdir $HOME/.cache
+
+RUN apk --no-cache add openjdk11-jre bash
+
+RUN mkdir -p /firebase/functions
+RUN mkdir -p /firebase/emulators
+
+COPY serve.sh healthcheck.sh /usr/bin/
+
+HEALTHCHECK --interval=1s --timeout=1m --retries=60 \
+  CMD /usr/bin/healthcheck.sh
+ENTRYPOINT "/usr/bin/serve.sh"

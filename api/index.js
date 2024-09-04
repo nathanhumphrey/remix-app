@@ -1183,59 +1183,28 @@ function Index() {
   }, this);
 }
 
-// app/routes/tester.tsx
-var tester_exports = {};
-__export(tester_exports, {
-  default: () => Tester,
-  loader: () => loader5
-});
-var import_node7 = require("@remix-run/node"), import_react6 = require("@remix-run/react");
-var import_jsx_dev_runtime6 = require("react/jsx-dev-runtime"), loader5 = async () => (0, import_node7.json)(await users.getById("Wv3jQLi5CUUlsBfeiJLOjTta5wWP"));
-function Tester() {
-  let user = (0, import_react6.useLoaderData)();
-  return console.log(user), /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("div", { className: "remix__page", children: [
-    /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("main", { children: "TESTER" }, void 0, !1, {
-      fileName: "app/routes/tester.tsx",
-      lineNumber: 15,
-      columnNumber: 7
-    }, this),
-    user && /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("div", { children: [
-      "some user",
-      user.username
-    ] }, void 0, !0, {
-      fileName: "app/routes/tester.tsx",
-      lineNumber: 16,
-      columnNumber: 16
-    }, this)
-  ] }, void 0, !0, {
-    fileName: "app/routes/tester.tsx",
-    lineNumber: 14,
-    columnNumber: 5
-  }, this);
-}
-
 // app/routes/index.tsx
 var routes_exports = {};
 __export(routes_exports, {
   action: () => action3,
   default: () => Index2,
-  loader: () => loader6,
+  loader: () => loader5,
   meta: () => meta4
 });
-var import_react7 = require("react"), import_react8 = require("@remix-run/react"), import_node8 = require("@remix-run/node");
-var import_jsx_dev_runtime7 = require("react/jsx-dev-runtime"), meta4 = () => ({
+var import_react6 = require("react"), import_react7 = require("@remix-run/react"), import_node7 = require("@remix-run/node");
+var import_jsx_dev_runtime6 = require("react/jsx-dev-runtime"), meta4 = () => ({
   title: "Home Page"
 }), action3 = async ({ request }) => {
   try {
     let form = await request.formData(), email = form.get("email"), password = form.get("password");
-    return !email || email.trim() === "" ? (0, import_node8.json)(
+    return !email || email.trim() === "" ? (0, import_node7.json)(
       {
         status: "error",
         errorCode: "signup/invalid-email",
         errorMessage: "Email field cannot be empty"
       },
       { status: 400 }
-    ) : !password || password.trim() === "" ? (0, import_node8.json)(
+    ) : !password || password.trim() === "" ? (0, import_node7.json)(
       {
         status: "error",
         errorCode: "signup/invalid-password",
@@ -1244,7 +1213,7 @@ var import_jsx_dev_runtime7 = require("react/jsx-dev-runtime"), meta4 = () => ({
       { status: 400 }
     ) : auth2.login({ username: email, password });
   } catch {
-    return (0, import_node8.json)(
+    return (0, import_node7.json)(
       {
         status: "error",
         errorCode: "login/general",
@@ -1253,26 +1222,26 @@ var import_jsx_dev_runtime7 = require("react/jsx-dev-runtime"), meta4 = () => ({
       { status: 500 }
     );
   }
-}, loader6 = async ({ request }) => await auth2.user(request);
+}, loader5 = async ({ request }) => await auth2.user(request);
 function Index2() {
-  let actionError = (0, import_react8.useActionData)(), user = (0, import_react8.useLoaderData)(), emailRef = (0, import_react7.useRef)(null), passwordRef = (0, import_react7.useRef)(null);
-  return /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("div", { className: "remix__page", children: /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("main", { children: [
-    /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("h2", { children: "Home Page" }, void 0, !1, {
+  let actionError = (0, import_react7.useActionData)(), user = (0, import_react7.useLoaderData)(), emailRef = (0, import_react6.useRef)(null), passwordRef = (0, import_react6.useRef)(null);
+  return /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("div", { className: "remix__page", children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("main", { children: [
+    /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("h2", { children: "Home Page" }, void 0, !1, {
       fileName: "app/routes/index.tsx",
       lineNumber: 72,
       columnNumber: 9
     }, this),
-    /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("p", { children: "Everyone can view the home page." }, void 0, !1, {
+    /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("p", { children: "Everyone can view the home page." }, void 0, !1, {
       fileName: "app/routes/index.tsx",
       lineNumber: 73,
       columnNumber: 9
     }, this),
-    user && /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)(import_jsx_dev_runtime7.Fragment, { children: [
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("p", { children: [
+    user && /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_jsx_dev_runtime6.Fragment, { children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("p", { children: [
         "Hello ",
         user.name,
         ", you can now view the ",
-        /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)(import_react8.Link, { to: "/protected", children: "protected page." }, void 0, !1, {
+        /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_react7.Link, { to: "/protected", children: "protected page." }, void 0, !1, {
           fileName: "app/routes/index.tsx",
           lineNumber: 77,
           columnNumber: 55
@@ -1282,7 +1251,7 @@ function Index2() {
         lineNumber: 76,
         columnNumber: 13
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)(import_react8.Form, { method: "post", action: "/logout", children: /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("button", { children: "Logout" }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_react7.Form, { method: "post", action: "/logout", children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("button", { children: "Logout" }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 80,
         columnNumber: 15
@@ -1295,48 +1264,48 @@ function Index2() {
       fileName: "app/routes/index.tsx",
       lineNumber: 75,
       columnNumber: 11
-    }, this) || /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("section", { children: /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)(import_react8.Form, { className: "remix__form", method: "post", children: [
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("h3", { children: "Login Form" }, void 0, !1, {
+    }, this) || /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("section", { children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)(import_react7.Form, { className: "remix__form", method: "post", children: [
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("h3", { children: "Login Form" }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 86,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("label", { htmlFor: "email", children: "Email:" }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("label", { htmlFor: "email", children: "Email:" }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 87,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("input", { type: "text", id: "email", name: "email", ref: emailRef }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("input", { type: "text", id: "email", name: "email", ref: emailRef }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 88,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("br", {}, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("br", {}, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 89,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("label", { htmlFor: "email", children: "Password:" }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("label", { htmlFor: "email", children: "Password:" }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 90,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("input", { type: "password", id: "password", name: "password", ref: passwordRef }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("input", { type: "password", id: "password", name: "password", ref: passwordRef }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 91,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("br", {}, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("br", {}, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 92,
         columnNumber: 15
       }, this),
-      /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("button", { type: "submit", children: "Login" }, void 0, !1, {
+      /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("button", { type: "submit", children: "Login" }, void 0, !1, {
         fileName: "app/routes/index.tsx",
         lineNumber: 93,
         columnNumber: 15
       }, this),
-      (actionError == null ? void 0 : actionError.errorCode) && /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("p", { children: /* @__PURE__ */ (0, import_jsx_dev_runtime7.jsxDEV)("em", { children: [
+      (actionError == null ? void 0 : actionError.errorCode) && /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("p", { children: /* @__PURE__ */ (0, import_jsx_dev_runtime6.jsxDEV)("em", { children: [
         "Login failed: ",
         actionError.errorMessage
       ] }, void 0, !0, {
@@ -1369,7 +1338,7 @@ function Index2() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "8c7d54a0", entry: { module: "/build/entry.client-C53OCUIZ.js", imports: ["/build/_shared/chunk-QQXQO5U5.js", "/build/_shared/chunk-FOBQCQPJ.js", "/build/_shared/chunk-5KL4PAQL.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-4KQFWZOH.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/db-test": { id: "routes/db-test", parentId: "root", path: "db-test", index: void 0, caseSensitive: void 0, module: "/build/routes/db-test-2ET3D5GN.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-IBZX4YCU.js", imports: ["/build/_shared/chunk-ZPFOYRVQ.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-DOMDNNGV.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/protected": { id: "routes/protected", parentId: "root", path: "protected", index: void 0, caseSensitive: void 0, module: "/build/routes/protected-WP5BEJS3.js", imports: ["/build/_shared/chunk-ZPFOYRVQ.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/protected/index": { id: "routes/protected/index", parentId: "routes/protected", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/protected/index-KHZKN6EH.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/signup": { id: "routes/signup", parentId: "root", path: "signup", index: void 0, caseSensitive: void 0, module: "/build/routes/signup-TDYTJ6ZE.js", imports: ["/build/_shared/chunk-ZPFOYRVQ.js", "/build/_shared/chunk-HGYPKNEV.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/tester": { id: "routes/tester", parentId: "root", path: "tester", index: void 0, caseSensitive: void 0, module: "/build/routes/tester-SJ22CV4V.js", imports: ["/build/_shared/chunk-HGYPKNEV.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, cssBundleHref: void 0, url: "/build/manifest-8C7D54A0.js" };
+var assets_manifest_default = { version: "741c2e55", entry: { module: "/build/entry.client-C53OCUIZ.js", imports: ["/build/_shared/chunk-QQXQO5U5.js", "/build/_shared/chunk-FOBQCQPJ.js", "/build/_shared/chunk-5KL4PAQL.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-4KQFWZOH.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !0, hasErrorBoundary: !0 }, "routes/db-test": { id: "routes/db-test", parentId: "root", path: "db-test", index: void 0, caseSensitive: void 0, module: "/build/routes/db-test-2ET3D5GN.js", imports: void 0, hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/index": { id: "routes/index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/index-IBZX4YCU.js", imports: ["/build/_shared/chunk-ZPFOYRVQ.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/logout": { id: "routes/logout", parentId: "root", path: "logout", index: void 0, caseSensitive: void 0, module: "/build/routes/logout-DOMDNNGV.js", imports: void 0, hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/protected": { id: "routes/protected", parentId: "root", path: "protected", index: void 0, caseSensitive: void 0, module: "/build/routes/protected-WP5BEJS3.js", imports: ["/build/_shared/chunk-ZPFOYRVQ.js"], hasAction: !1, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/protected/index": { id: "routes/protected/index", parentId: "routes/protected", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/protected/index-KHZKN6EH.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/signup": { id: "routes/signup", parentId: "root", path: "signup", index: void 0, caseSensitive: void 0, module: "/build/routes/signup-ZA4FQTO3.js", imports: ["/build/_shared/chunk-ZPFOYRVQ.js"], hasAction: !0, hasLoader: !0, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, cssBundleHref: void 0, url: "/build/manifest-741C2E55.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var assetsBuildDirectory = "public/build", future = { unstable_cssModules: !1, unstable_cssSideEffectImports: !1, unstable_dev: !1, unstable_vanillaExtract: !1, v2_errorBoundary: !1, v2_meta: !1, v2_routeConvention: !1 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
@@ -1420,14 +1389,6 @@ var assetsBuildDirectory = "public/build", future = { unstable_cssModules: !1, u
     index: void 0,
     caseSensitive: void 0,
     module: signup_exports
-  },
-  "routes/tester": {
-    id: "routes/tester",
-    parentId: "root",
-    path: "tester",
-    index: void 0,
-    caseSensitive: void 0,
-    module: tester_exports
   },
   "routes/index": {
     id: "routes/index",

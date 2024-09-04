@@ -1,0 +1,13 @@
+services:
+  firebase-emulator:
+    build:
+      dockerfile: fb-dockerfile
+    ports:
+      - 4000:4000 # ui
+      - 6001:5000 # hosting
+      - 5001:5001 # functions
+      - 8080:8080 # firestore
+      - 9000:9000 # auth
+      - 9099:9099 # emulators
+    volumes:
+      - './:/firebase'
