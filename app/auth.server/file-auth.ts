@@ -4,8 +4,13 @@ import { json, redirect } from '@remix-run/node';
 import type { AppError } from '~/util';
 import type { Auth, AuthSession, AuthUser } from './auth-types';
 
-// location of users.json file relative to build path NOT app
-const usersFile = path.join(__dirname, '../../app/auth.server/users.json');
+// location of users.json file relative to this file, NOT app
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const usersFile = path.join(__dirname, '../../../app/auth.server/users.json');
 
 /**
  * DO NOT USE THIS IMPLEMENTATION IN PRODUCTION.
@@ -53,7 +58,9 @@ export class FileAuth implements Auth<AuthUser> {
 
   async login(user: AuthUser): Promise<Response> {
     if (this.exists(user)) {
-      let match: AuthUser | undefined = this.users.find((u) => user.username === u.username);
+      let match: AuthUser | undefined = this.users.find(
+        (u) => user.username === u.username
+      );
 
       if (match && match.password === user.password) {
         // stuff any required info into the user session
@@ -80,7 +87,11 @@ export class FileAuth implements Auth<AuthUser> {
     return false;
   }
 
-  async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
+  async requireUser(
+    request: Request,
+    role: string | null = null,
+    redirectTo?: string
+  ): Promise<Response> {
     const user = await this.user(request);
     if (user === null || (role && role !== user?.role)) {
       if (redirectTo) {

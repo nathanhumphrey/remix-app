@@ -1,15 +1,19 @@
-import type { Config } from '@jest/types';
+import { createDefaultPreset, type JestConfigWithTsJest } from 'ts-jest';
+//import type { Config } from '@jest/types';
 
-const config: Config.InitialOptions = {
+const config: JestConfigWithTsJest = {
   moduleNameMapper: {
     '~/(.*)': '<rootDir>/app/$1',
   },
-  preset: 'ts-jest/presets/default-esm', // or other ESM presets
-  globals: {
-    'ts-jest': {
-      useESM: true,
-    },
+  transform: {
+    ...createDefaultPreset().transform,
   },
+  //preset: 'ts-jest/presets/default-esm', // or other ESM presets
+  // globals: {
+  //   'ts-jest': {
+  //     useESM: true,
+  //   },
+  // },
   roots: ['__tests__'],
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'js', 'json'],

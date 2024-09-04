@@ -24,7 +24,11 @@ export type AuthSession = {
    * @param {string} redirectTo the location to redirect to on success
    * @returns {Promise<Response>} Promise object that resolves a Response
    */
-  destroyAuthSession(request: Request, keys: string[] | string, redirectTo?: string): Promise<Response>;
+  destroyAuthSession(
+    request: Request,
+    keys: string[] | string,
+    redirectTo?: string
+  ): Promise<Response>;
 };
 
 /**
@@ -99,7 +103,7 @@ export interface Auth<User extends AuthUser> {
   /**
    * Returns the currently authenticated user details
    * @param {Request} request the resource request
-   * @returns {any} Return or resolve an AuthUserType object or null
+   * @returns {Promise<AuthUser | null>} Return or resolve an AuthUserType object or null
    */
-  user(request: Request): any;
+  user(request: Request): Promise<AuthUser | null>;
 }

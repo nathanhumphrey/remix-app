@@ -1,25 +1,32 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["**/*.test.ts", "**/*.test.tsx", "**/test/*", "**/__tests__/*"],
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx"
+  ],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2021"],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "types": ["@remix-run/node", "vite/client", "@types/jest"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "target": "ES2019",
+    "target": "ES2022",
     "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"]
     },
-    "strictNullChecks": true,
-    "strictPropertyInitialization": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitAny": true,
-    "noEmit": true,
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true
+
+    // Vite takes care of building everything, not tsc.
+    "noEmit": true
   }
 }

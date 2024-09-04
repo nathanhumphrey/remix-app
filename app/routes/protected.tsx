@@ -1,11 +1,9 @@
 import { Form, Outlet, useLoaderData } from '@remix-run/react';
-import type { LoaderFunction } from '@remix-run/node';
+import type { LoaderFunction, MetaFunction } from '@remix-run/node';
 import { auth } from '~/auth.server';
 
-export let meta = () => {
-  return {
-    title: 'Protected Page',
-  };
+export const meta: MetaFunction = () => {
+  return [{ title: 'Protected Page' }];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -17,7 +15,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Secrets() {
-  const user = useLoaderData() || { username: 'foo', id: 'bar', name: 'baz', role: 'shazam' };
+  const user = useLoaderData<typeof loader>() || {
+    username: 'foo',
+    id: 'bar',
+    name: 'baz',
+    role: 'shazam',
+  };
 
   return (
     <div className="remix__page">
