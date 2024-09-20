@@ -6,7 +6,7 @@ import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import type { AppError } from '~/util';
 import { users } from '~/controllers.server';
 
-export let meta = () => {
+export const meta = () => {
   return {
     title: 'Sign Up Page',
   };
@@ -17,9 +17,9 @@ export const action: ActionFunction = async ({ request }) => {
     const form = await request.formData();
 
     // TODO: implement proper form validation
-    const email: any = form.get('email');
-    const password: any = form.get('password');
-    const confirm: any = form.get('confirm');
+    const email = form.get('email') as string;
+    const password = form.get('password') as string;
+    const confirm = form.get('confirm') as string;
 
     // TODO: form validation
     if (!email || email.trim() === '') {
@@ -47,7 +47,7 @@ export const action: ActionFunction = async ({ request }) => {
     // TODO: CSRF check
 
     // Create the account
-    const res = await (await auth.createAccount({ username: email, password })).json();
+    const res = await (await auth.createAccount({ username: email, password }) as Response).json();
     // Create the user in the database
     await users.create({ id: res.user.uid, role: 'guest', username: res.user.email, preferences: { theme: 'dark' } });
     // Redirect to the home/login page
@@ -75,7 +75,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Index() {
-  const actionError = useActionData();
+  const actionError = useActionData() as AppError | null;
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const confirmRef = useRef(null);

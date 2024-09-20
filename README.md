@@ -216,9 +216,10 @@ export SESSION_SECRET="SECRET_VALUE"
 # Add this env variable to your deployment dashboard/server
 export FIREBASE_WEB_API_KEY="YOUR_FIREBASE_API_KEY"
 
-# Required for local production testing. Include your service account
-# file contents as a JSON string for the env variable below.
-# Add this env variable to your deployment dashboard/server
+# Required for local auth (even in development) and production testing.
+# Include your service account file contents as a JSON string for the
+# env variable below.
+# Add this env variable to your dashboard/server for deployment.
 export FIREBASE_SERVICE_ACCOUNT_KEY='JSON_SERVICE_ACCOUNT_STRING'
 
 # Firebase Emulator Connection Vars
@@ -233,7 +234,10 @@ To make use of the file, make a copy or rename the file to `env.sh`, update the 
 $ . .env.sh
 ```
 
-You should now be able to run the application in development or deploy to Vercel for production.
+NOTE: for Windows users, there is a Powershell script you can use to achieve the same (`env.ps1.example`).
+
+You should now be able to run the application in development or deploy to your desired target.
+See the official docs for your target deployment platform. [Remix Deployment](https://remix.run/docs/en/main/guides/deployment).
 
 ## License
 

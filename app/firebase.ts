@@ -7,15 +7,14 @@ import type { Auth } from 'firebase-admin/auth';
 import type { Firestore } from 'firebase-admin/firestore';
 
 let app: App;
-let auth: Auth;
 let restApiSignInUrl = '';
-let db: Firestore;
-console.log('NODE_ENV', process.env.NODE_ENV);
+
 if (process.env.NODE_ENV === 'development') {
   app =
     getApps().length === 0
-      ? initializeApp({ projectId: 'demo-remix-app' })
+      ? initializeApp({ projectId: 'demo-project' })
       : getApp();
+
   restApiSignInUrl = `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=123`;
 } else {
   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY === undefined) {
@@ -36,7 +35,7 @@ if (process.env.NODE_ENV === 'development') {
   restApiSignInUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_WEB_API_KEY}`;
 }
 
-auth = getAuth(app);
-db = getFirestore(app);
+const auth: Auth = getAuth(app);
+const db: Firestore = getFirestore(app);
 
 export { app, auth, db, restApiSignInUrl };

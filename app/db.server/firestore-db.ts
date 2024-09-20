@@ -39,13 +39,13 @@ export class FirestoreDB implements DB {
     return new DBResult([]);
   }
 
-  async executeInsert(model: any, options: QueryOptions): Promise<DBResult> {
+  async executeInsert(model: {id?: string}, options: QueryOptions): Promise<DBResult> {
     try {
       const collectionRef = db.collection(options.collection);
       let inserted: DocumentData | undefined;
 
       if (Object.getOwnPropertyDescriptor(model, 'id')) {
-        inserted = await collectionRef.doc(model['id']).set(model);
+        inserted = await collectionRef.doc(model['id']!).set(model);
       } else {
         inserted = (await (await collectionRef.add(model)).get()).data();
       }
@@ -62,7 +62,7 @@ export class FirestoreDB implements DB {
     return new DBResult([]);
   }
 
-  async executeUpdate(model: any, options: QueryOptions): Promise<DBResult> {
+  async executeUpdate(model: object, options: QueryOptions): Promise<DBResult> {
     try {
       const collectionRef = db.collection(options.collection);
       const query = collectionRef.where(
@@ -89,7 +89,7 @@ export class FirestoreDB implements DB {
     return new DBResult([]);
   }
 
-  async executeDelete(model: any, options: QueryOptions): Promise<DBResult> {
+  async executeDelete(options: QueryOptions): Promise<DBResult> {
     try {
       const collectionRef = db.collection(options.collection);
       const query = collectionRef.where(
@@ -116,7 +116,7 @@ export class FirestoreDB implements DB {
 
   /**
    * This method provides direct access to the underlying database (Firestore)
-   * object. WARNING: making use of the direct databas access feature may impact
+   * object. WARNING: making use of the direct database access feature may impact
    * the interchangeability of databases in your application; use this feature wisely.
    * @returns {FirebaseFirestore.Firestore} the Firestore instance
    */

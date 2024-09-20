@@ -1,12 +1,11 @@
 import { readFileSync, writeFileSync } from 'fs';
-import path from 'path';
+import path, {dirname} from 'path';
 import { json, redirect } from '@remix-run/node';
 import type { AppError } from '~/util';
 import type { Auth, AuthSession, AuthUser } from './auth-types';
 
 // location of users.json file relative to this file, NOT app
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -22,8 +21,8 @@ export class FileAuth implements Auth<AuthUser> {
   private users: AuthUser[];
 
   constructor(private session: AuthSession) {
-    let rawdata = readFileSync(usersFile);
-    let users = JSON.parse(rawdata.toString());
+    const rawdata = readFileSync(usersFile);
+    const users = JSON.parse(rawdata.toString());
     this.users = users;
   }
 
@@ -58,7 +57,7 @@ export class FileAuth implements Auth<AuthUser> {
 
   async login(user: AuthUser): Promise<Response> {
     if (this.exists(user)) {
-      let match: AuthUser | undefined = this.users.find(
+      const match: AuthUser | undefined = this.users.find(
         (u) => user.username === u.username
       );
 
@@ -143,13 +142,16 @@ export class FileAuth implements Auth<AuthUser> {
  * @license MIT license
  * @link http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
  **/
+interface UUIDInterface {
+  generate(): string;
+}
 const UUID = (function () {
-  const self: any = {};
-  const lut: [] | any = [];
+  const self = {} as UUIDInterface;
+  const lut: string[] = [];
   for (let i = 0; i < 256; i++) {
     lut[i] = (i < 16 ? '0' : '') + i.toString(16);
   }
-  self.generate = function () {
+  self.generate = function (): string {
     const d0 = (Math.random() * 0xffffffff) | 0;
     const d1 = (Math.random() * 0xffffffff) | 0;
     const d2 = (Math.random() * 0xffffffff) | 0;

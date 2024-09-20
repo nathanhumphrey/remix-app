@@ -1,11 +1,11 @@
 /**
- * Abstract DBResult to represent results from any database.
+ * Default DBResult to represent results from any database.
  */
 export class DBResult {
   /**
    * Instantiates a new DBResult object.
-   * @param {object[]} records? optional initial array of entities for this DB result
-   * @param {number} affected? the number of records
+   * @param {object[]} records? initial array of entities for this DB result
+   * @param {number} affected? the number of records affected or returned in this DB result (defaults to length of records)
    */
   constructor(protected records: object[], protected affected: number = 0) {
     this.records = records || [];
@@ -37,11 +37,17 @@ export type Condition = {
   value: unknown;
 };
 
+/**
+ * Represents the type used to define an order by option
+ */
 export type OrderByOptions = {
   field: string;
   direction?: 'asc' | 'desc';
 };
 
+/**
+ * Represents the type used to define a limit option
+ */
 export type LimitOptions = {
   max: number;
   offset?: number;
@@ -67,7 +73,7 @@ export type QueryOptions = {
  */
 export interface DB {
   /**
-   * Queries the database.
+   * Queries the database
    * @param {QueryOptions} options optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
@@ -89,13 +95,11 @@ export interface DB {
    */
   executeUpdate(model: object, queryOptions?: QueryOptions): Promise<DBResult>;
   /**
-   * Deletes an entity from the database
-   * @template Model
-   * @param {Model} model a generic parameter that represents the desired model to delete
+   * Deletes from the database
    * @param {QueryOptions} queryOptions optional modifiers for the query
    * @returns {DBResult}  A DBResult object
    */
-  executeDelete(model: object, queryOptions?: QueryOptions): Promise<DBResult>;
+  executeDelete(queryOptions?: QueryOptions): Promise<DBResult>;
 }
 
 /**

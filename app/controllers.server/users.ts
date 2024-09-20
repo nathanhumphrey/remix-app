@@ -111,9 +111,6 @@ export class Users extends Controller<UserType, User> {
 
       try {
         const result: DBResult = await this.db.executeDelete(
-          {
-            id: userData.id,
-          },
           { collection: this.collection, where: { field: 'id', operator: '==', value: userData.id } }
         );
 

@@ -17,5 +17,7 @@ env.ps1
 *firebase-adminsdk*
 app/sessions/*
 
+firebase-account-key.json
+
 #misc
 .DS_Store

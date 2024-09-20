@@ -1,4 +1,4 @@
-import { installGlobals } from '@remix-run/node';
+import { installGlobals, Session } from '@remix-run/node';
 import { FirebaseAuth } from '../../app/auth.server/firebase-auth';
 import type { AuthSession } from '../../app/auth.server/auth-types';
 
@@ -8,31 +8,32 @@ const testUserCredentials = {
 };
 
 const sessionMock: AuthSession = {
-  getAuthSession: function (): Promise<any> {
-    return Promise.resolve('getAuthSession');
+  getAuthSession: function (): Promise<Session> {
+    return Promise.resolve('getAuthSession' as unknown as Session);
   },
 
-  createAuthSession: function (data): any {
-    return {
+  createAuthSession: function (data): Promise<Response> {
+    return Promise.resolve(
+      {
       status: 200,
       json: () =>
         Promise.resolve({
           status: 'success',
           data,
         }),
-    };
+    } as Response);
   },
 
-  destroyAuthSession: function (): Promise<any> {
-    return Promise.resolve('destroyAuthSession');
+  destroyAuthSession: function (): Promise<Response> {
+    return Promise.resolve(new Response('destroyAuthSession'));
   },
 };
 
 let auth: FirebaseAuth;
 
-beforeAll(() => {
+beforeAll(async () => {
   auth = new FirebaseAuth(sessionMock);
-  return Promise.all([clearEmulatorAccounts(), createEmulatorAccount()]);
+  return await Promise.all([clearEmulatorAccounts(), createEmulatorAccount()]);
 });
 
 afterAll(async () => {
@@ -47,8 +48,8 @@ describe('FirebaseAuth', () => {
       password: 'new123',
     };
 
-    let res = await auth.createAccount(newUser);
-    let data = await res.json();
+    const res = await auth.createAccount(newUser);
+    const data = await res.json();
 
     // check the api
     expect(res.status).toEqual(201);
@@ -65,11 +66,11 @@ describe('FirebaseAuth', () => {
 
     type UType = {
       idToken: string;
-      user: any;
+      user: unknown;
     };
 
-    let res = await auth.login(testUserCredentials);
-    let data = (await res.json()).data as UType;
+    const res = await auth.login(testUserCredentials);
+    const data = (await res.json()).data as UType;
 
     // TODO: think about how I'm checking for success here ...
 
@@ -80,15 +81,15 @@ describe('FirebaseAuth', () => {
     // TODO: spy on session mock createAuthSession for called with
   });
 
-  it('performs logout', () => {
+  it.skip('performs logout', () => {
     expect(true).toEqual(false);
   });
 
-  it('checks for required user', () => {
+  it.skip('checks for required user', () => {
     expect(true).toEqual(false);
   });
 
-  it('returns current the user', () => {
+  it.skip('returns current the user', () => {
     expect(true).toEqual(false);
   });
 });
@@ -96,7 +97,7 @@ describe('FirebaseAuth', () => {
 installGlobals();
 
 function clearEmulatorAccounts(): Promise<Response> {
-  return fetch('http://localhost:9099/emulator/v1/projects/demo-remix-app/accounts', {
+  return fetch('http://localhost:9099/emulator/v1/projects/demo-project/accounts', {
     method: 'delete',
   });
 }
@@ -120,7 +121,7 @@ function createEmulatorAccount(): Promise<Response> {
 }
 
 async function isEmailRegistered(email: string): Promise<boolean> {
-  let res = await fetch(
+  const res = await fetch(
     `http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key=123`,
 
     {

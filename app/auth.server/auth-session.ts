@@ -2,13 +2,14 @@ import { json, redirect } from '@remix-run/node';
 import { getSession, commitSession } from '~/util/session';
 import type { Session } from '@remix-run/node';
 import type { AuthSession } from './auth-types';
+import type { ObjectLiteral } from '~/util';
 
 export const authSession: AuthSession = {
   getAuthSession(request: Request): Promise<Session> {
     return getSession(request.headers.get('Cookie'));
   },
 
-  async createAuthSession(data: any, redirectTo?: string): Promise<Response> {
+  async createAuthSession(data: ObjectLiteral, redirectTo?: string): Promise<Response> {
     try {
       const session: Session = await getSession();
 

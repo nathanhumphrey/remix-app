@@ -25,8 +25,8 @@ export const action: ActionFunction = async ({
     const form = await request.formData();
 
     // TODO: implement proper form validation
-    const email: any = form.get('email');
-    const password: any = form.get('password');
+    const email = form.get('email') as string;
+    const password = form.get('password') as string;
 
     // TODO: form validation
     if (!email || email.trim() === '') {

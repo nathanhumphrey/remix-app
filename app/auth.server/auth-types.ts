@@ -16,7 +16,7 @@ export type AuthSession = {
    * @param {string} redirectTo the location to redirect to on success
    * @returns {Promise<Response>} Promise object that resolves a Response
    */
-  createAuthSession(data: any, redirectTo?: string): Promise<Response>;
+  createAuthSession(data: unknown, redirectTo?: string): Promise<Response>;
   /**
    * Destroys or otherwise invalidates the user session.
    * @param {Request} request the resource request
@@ -39,15 +39,15 @@ export type AuthUser = {
   /**
    * Unique identifier for a user
    */
-  id?: any;
+  id?: string;
   /**
    * Unique name assigned to a user (typically an email)
    */
-  username?: any;
+  username?: string;
   /**
    * User's password; for sign in and account creation
    */
-  password?: any;
+  password?: string;
   /**
    * Display name for the user
    */
@@ -55,7 +55,7 @@ export type AuthUser = {
   /**
    * Assigned role for the user account
    */
-  role?: any;
+  role?: string;
 };
 
 /**
@@ -68,23 +68,23 @@ export interface Auth<User extends AuthUser> {
    * Creates a new user account
    * @param {User} user the user account details
    * @param {string} redirectTo the location to redirect to on success
-   * @returns {any} Typically a Promise object that resolves a Response
+   * @returns {unknown} Typically a Promise object that resolves a Response
    */
-  createAccount(user: User, redirectTo?: string): any;
+  createAccount(user: User, redirectTo?: string): unknown;
   /**
    * Login in a user.
    * @param {User} user the user account details
    * @param {string} redirectTo the location to redirect to on success
-   * @returns {any} Typically a Promise object that resolves a Response
+   * @returns {unknown} Typically a Promise object that resolves a Response
    */
-  login(user: User, redirectTo?: string): any;
+  login(user: User, redirectTo?: string): unknown;
   /**
    * Logout a user.
    * @param {Request} request the resource request
    * @param {string} redirectTo the location to redirect to on success
-   * @returns {any} Typically a Promise object that resolves a Response
+   * @returns {unknown} Typically a Promise object that resolves a Response
    */
-  logout(request: Request, redirectTo?: string): any;
+  logout(request: Request, redirectTo?: string): unknown;
   /**
    * Determines if a user account already exists.
    * @param {User} user the user account details
@@ -95,15 +95,16 @@ export interface Auth<User extends AuthUser> {
    * Ensures that a user is signed in and optionally that the user holds
    * the necessary role for access to a resource.
    * @param {Request} request the resource request
-   * @param {string | null} role the role assigned to the user (pass null for any)
+   * @param {string | null} role the role assigned to the user (pass null for unknown)
    * @param {string} redirectTo where to redirect the user if the requirement fails
-   * @returns {any} Typically a Promise object that resolves a Response
+   * @returns {Promise<Response>} a Promise that resolves a Response
+   * @throws {Error} Throws an Error object if the user is not authenticated or lacks the necessary role
    */
-  requireUser(request: Request, role?: string | null, redirectTo?: string): any;
+  requireUser(request: Request, role?: string | null, redirectTo?: string): unknown;
   /**
    * Returns the currently authenticated user details
    * @param {Request} request the resource request
-   * @returns {Promise<AuthUser | null>} Return or resolve an AuthUserType object or null
+   * @returns {Promise<AuthUser | null>} a Promise that resolves an AuthUserType object or null
    */
   user(request: Request): Promise<AuthUser | null>;
 }

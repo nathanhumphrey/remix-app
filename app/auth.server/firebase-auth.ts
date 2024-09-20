@@ -10,6 +10,13 @@ import type { Auth, AuthSession, AuthUser } from './auth-types';
 export class FirebaseAuth implements Auth<AuthUser> {
   constructor(private session: AuthSession) {}
 
+  /**
+   * Create a new user account
+   * @param {AuthUser} user 
+   * @param {string} redirectTo the URL to redirect to after account creation
+   * @returns {Promise<Response>} Returns a response object with status 201 if successful,
+   * otherwise an error response
+   */
   async createAccount(user: AuthUser, redirectTo?: string): Promise<Response> {
     if (!user?.username || !user?.password) {
       return json<AppError>(
@@ -50,6 +57,12 @@ export class FirebaseAuth implements Auth<AuthUser> {
     }
   }
 
+  /**
+   * Login a user
+   * @param {AuthUser} user 
+   * @returns {Promise<Response>} Returns a response object with status 201 if successful,
+   * otherwise an error response
+   */
   async login(user: AuthUser): Promise<Response> {
     if (!user?.username || !user?.password) {
       return json<AppError>(
@@ -78,7 +91,7 @@ export class FirebaseAuth implements Auth<AuthUser> {
         }),
       });
       const authResponse: Response = await fetch(req);
-      const credentials: any = await authResponse.json();
+      const credentials = await authResponse.json();
 
       // check for error
       if (credentials.error) {
@@ -135,13 +148,20 @@ export class FirebaseAuth implements Auth<AuthUser> {
     }
   }
 
+  /**
+   * Logout a user
+   * @param {Request} request
+   * @param {string} redirectTo the URL to redirect to after logout
+   * @returns {Promise<Response>} Returns a response object with status 200 if successful,
+   * otherwise an error response
+   */
   logout(request: Request, redirectTo = '/'): Promise<Response> {
     return this.session.destroyAuthSession(request, ['idToken', 'user'], redirectTo);
   }
 
   async exists(user: AuthUser): Promise<boolean> {
     try {
-      if (await auth.getUserByEmail(user.username)) {
+      if (await auth.getUserByEmail(user.username ?? '')) {
         return true;
       }
     } catch (error) {
@@ -158,6 +178,14 @@ export class FirebaseAuth implements Auth<AuthUser> {
     return false;
   }
 
+  /**
+   * Require a user to be logged in for access
+   * @param {Request} request
+   * @param {string} role the role required for access
+   * @param {string} redirectTo the URL to redirect to if access is denied
+   * @returns {Promise<Response>} Returns a response object with status 200 if successful,
+   * otherwise an error response
+   */
   async requireUser(request: Request, role: string | null = null, redirectTo?: string): Promise<Response> {
     const session = await this.session.getAuthSession(request);
     const sessionIdToken = session.get('idToken');
@@ -197,6 +225,11 @@ export class FirebaseAuth implements Auth<AuthUser> {
     }
   }
 
+  /**
+   * Retrieve the current user
+   * @param {Request} request
+   * @returns {Promise<AuthUser | null>} Returns the current user or null if not logged in
+   */
   async user(request: Request): Promise<AuthUser | null> {
     const session = await this.session.getAuthSession(request);
     const user: AuthUser = JSON.parse(session.get('user') || null);

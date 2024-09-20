@@ -1,2 +1,3 @@
 import type { AppError } from './error-types';
-export type { AppError };
+import type { ObjectLiteral } from './object-types';
+export type { AppError, ObjectLiteral };

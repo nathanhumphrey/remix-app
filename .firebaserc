@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "real-estate-crm-e3f51",
-    "development": "demo-project"
+    "default": "demo-project",
+    "prod": "real-estate-crm-e3f51"
   }
 }
