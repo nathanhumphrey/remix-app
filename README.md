@@ -116,7 +116,7 @@ This file exports any model implementations (e.g. `User` in the starter) for use
 
 The project ships with some basic routes to demonstrate auth and database functionality. Modify or remove them as necessary. This directory contains the following files:
 
-#### [`index.tsx`](app/routes/index.tsx)
+#### [`_index.tsx`](app/routes/_index.tsx)
 
 This route provides a login form if a user has not logged in, and a welcome message if the user is logged in. You can view sample users for file-based auth in the [`app/auth.server/users.json`](app/auth.server/users.json) file, or via the Firebase Emulatory UI.
 
@@ -126,7 +126,11 @@ This route does not render a component. It only serves as a POST (i.e. action) e
 
 #### [`protected.tsx`](app/routes/protected.tsx)
 
-This route is protected and requires a user to be authenticated for access.
+This route layout is protected and requires a user to be authenticated for access.
+
+#### [`protected._index.tsx`](app/routes/protected._index.tsx)
+
+This nested route is rendered as the default for the protected layout.
 
 #### [`signup.tsx`](app/routes/signup.tsx)
 
